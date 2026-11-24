@@ -1,0 +1,3 @@
+# Fase de piloto: que los buscadores no listen la página. Quitar estas dos líneas al lanzar.
+User-agent: *
+Disallow: /

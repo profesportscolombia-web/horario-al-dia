@@ -1,0 +1,1216 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Horario al Día</title>
+<meta name="robots" content="noindex, nofollow"><!-- piloto: quitar al lanzar -->
+<meta name="theme-color" content="#0f2a1f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Horario al Día">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="iconos/icono-192.png">
+<link rel="apple-touch-icon" href="iconos/apple-touch-icon.png">
+<style>
+:root{--bg:#0f2a1f;--panel:#16372a;--card:#fff;--ink:#14231b;--lime:#b6e03a;--yel:#ffd23f;--coral:#ff6f59;--mut:#5c6f64;--line:#d8e2dc}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{padding:14px 16px;color:#fff;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;justify-content:space-between}
+header h1{margin:0;font-size:1.25rem}
+header h1 span{color:var(--lime)}
+header label{color:#cfe6d8}
+.aviso{background:var(--yel);color:#4a3a00;padding:6px 16px;font-size:.85rem}
+nav{display:flex;gap:6px;padding:0 12px;flex-wrap:wrap}
+nav button{border:0;padding:10px 14px;border-radius:10px 10px 0 0;background:var(--panel);color:#cfe6d8;font-size:.95rem;cursor:pointer}
+nav button.on{background:var(--card);color:var(--ink);font-weight:700}
+main{background:var(--card);margin:0 12px 24px;padding:16px;border-radius:0 12px 12px 12px;min-height:60vh}
+.tab{display:none}.tab.on{display:block}
+label{font-size:.85rem;color:var(--mut);display:block;margin-bottom:3px}
+input,select{padding:8px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;max-width:100%}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:12px}
+h2{margin:18px 0 8px;font-size:1.05rem}
+button.b{background:var(--ink);color:#fff;border:0;padding:9px 14px;border-radius:9px;cursor:pointer;font-size:.9rem}
+button.b.lime{background:var(--lime);color:var(--ink);font-weight:700}
+button.b.wa{background:#25a244}
+button.b.ghost{background:#eef3f0;color:var(--ink)}
+.seg{display:inline-flex;border:2px solid var(--ink);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:#fff;padding:9px 16px;font-size:.95rem;cursor:pointer}
+.seg button.on{background:var(--ink);color:#fff;font-weight:700}
+button.s{border:1px solid var(--line);background:#fff;border-radius:7px;padding:3px 8px;font-size:.78rem;cursor:pointer}
+button.s.ok{background:#d9f3c4;border-color:#8ac55a}
+button.s.no{background:#ffd9d3;border-color:#ee9a8d}
+table{border-collapse:collapse;width:100%;font-size:.78rem}
+th,td{border:1px solid var(--line);padding:4px 5px;text-align:center;vertical-align:top}
+th{background:#eef3f0;position:sticky;top:0}
+td.hora{white-space:nowrap;background:#f7faf8;font-weight:600;position:sticky;left:0}
+td.rec{background:#fff1c9}
+td.ok{background:#d9f3c4}
+td.ning{background:#ffd9d3}
+td.aus{background:#eee;color:#777}
+td.libre{color:#aaa}
+tr.desc td{background:#e5f5ba;font-weight:600}
+small{color:var(--mut)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.chip{border:1px solid var(--coral);background:#fff3f0;border-radius:10px;padding:5px 8px;display:flex;gap:6px;align-items:center;font-size:.85rem}
+.lista{max-height:210px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:6px;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:2px 10px}
+.lista label{color:var(--ink);font-size:.85rem;margin:0;padding:2px}
+.msg{border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;white-space:pre-wrap;font-size:.88rem}
+.scroll{overflow:auto;max-height:70vh}
+.leg span{display:inline-block;padding:2px 8px;border-radius:6px;margin-right:6px;font-size:.8rem}
+.kpis{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+.kpi{border:1px solid var(--line);border-radius:10px;padding:8px 12px;min-width:120px}
+.kpi b{font-size:1.4rem;display:block}
+.nov{border:1px solid var(--line);border-radius:10px;padding:7px 9px;margin-bottom:6px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:.86rem}
+.nov.ning{background:#ffd9d3}
+.nov .q{flex:1;min-width:220px}
+.nom-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px}
+.nom-row input{flex:1 1 200px;min-width:0}
+.nom-row select{flex:0 1 170px}
+.nom-row .n{width:28px;color:var(--mut);font-size:.8rem;text-align:right}
+.warn{background:#fff3f0;border:1px solid var(--coral);border-radius:10px;padding:8px 10px;margin:8px 0;font-size:.88rem}
+.inl{display:flex;align-items:center;gap:6px;color:var(--ink);font-size:.92rem;margin:0}
+@media print{
+ @page{size:landscape;margin:8mm}
+ body{background:#fff}header,nav,.aviso,.noimp,.tab{display:none!important}
+ main{margin:0;padding:0}
+ .tab.print{display:block!important}
+ table{font-size:8px}.scroll{max-height:none;overflow:visible}th,td{padding:2px}
+}
+</style>
+</head>
+<body>
+<header>
+ <h1>Horario <span>al Día</span></h1>
+ <div class="row" style="margin:0">
+  <div><label>Institución</label><input id="colegio"></div>
+  <div><label>Docentes del ejemplo</label>
+   <select id="tam"><option value="10">10</option><option value="20">20</option><option value="30">30</option><option value="40">40</option><option value="50">50</option></select></div>
+  <div><label>Clases por día</label>
+   <select id="np"><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></div>
+ </div>
+</header>
+<div class="aviso">Prototipo con docentes y grupos inventados. No usar datos reales de estudiantes. Los datos se guardan solo en este navegador.</div>
+<nav>
+ <button class="on" data-t="hoy">Horario</button>
+ <button data-t="gru">Grupos</button>
+ <button data-t="nom">Nombres de docentes</button>
+ <button data-t="doc">Docentes y preferencias</button>
+ <button data-t="are">Áreas y materias</button>
+ <button data-t="msj">Avisar por WhatsApp</button>
+ <button data-t="inf">Informe del mes</button>
+ <button data-t="mem">Memorias</button>
+ <button data-t="ayu">Ayuda y licencia</button>
+</nav>
+<main>
+
+<section class="tab on print" id="t-hoy">
+ <div class="noimp" id="memRapida" style="margin-bottom:10px"></div>
+ <div class="row noimp">
+  <div class="seg" id="vista"><button data-v="dia" class="on">Horario por día</button><button data-v="general">Horario general</button></div>
+  <div><label class="inl"><input type="checkbox" id="reemp"> Buscar reemplazos cuando falte un docente</label><small>Apagado: solo se ve el horario y quién falta.</small></div>
+ </div>
+ <div class="noimp" style="border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:12px">
+  <b>Jornada del colegio</b> <small>(sirve para la jornada «Normal»; las demás se calculan a partir de ella)</small>
+  <div class="row" style="margin:8px 0 0">
+   <div><label for="jIni">Hora de ingreso (6:00 a 18:00)</label><input type="time" id="jIni" min="06:00" max="18:00" step="300"></div>
+   <div><label for="jFin">Hora de salida (6:00 a 18:00)</label><input type="time" id="jFin" min="06:00" max="18:00" step="300"></div>
+   <div><label for="jMin">Minutos por clase</label><select id="jMin"></select></div>
+   <div><label for="jNd">Descansos (0 a 4)</label><select id="jNd"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+  </div>
+  <div id="jBreaks"></div>
+  <div id="jInfo" style="margin-top:8px;font-size:.9rem"></div>
+ </div>
+ <div id="avisoPref"></div>
+
+ <!-- VISTA POR DÍA -->
+ <div id="v-dia">
+  <div class="row noimp">
+   <div><label for="fecha">Día</label><input type="date" id="fecha"></div>
+   <div><label for="plantilla">Jornada de hoy</label>
+    <select id="plantilla">
+     <option value="normal">Normal</option>
+     <option value="reunion">Reunión de docentes</option>
+     <option value="izada">Izada de bandera (primera hora +20 min)</option>
+     <option value="temprano">Salida temprana</option>
+     <option value="otro">Otra (yo escojo)</option>
+    </select></div>
+   <div id="otro" style="display:none" class="row">
+    <div><label for="ini">Entrada</label><input type="time" id="ini" min="06:00" max="18:00" step="300"></div>
+    <div><label for="fin">Salida</label><input type="time" id="fin" min="06:00" max="18:00" step="300"></div>
+    <div><label for="desc">Descanso (min)</label><input type="number" id="desc" min="0" max="60" style="width:80px"></div>
+    <div><label for="extra">Extra 1.ª hora (min)</label><input type="number" id="extra" min="0" max="40" style="width:80px"></div>
+   </div>
+  </div>
+
+  <div class="noimp">
+   <h2>¿Quién falta hoy?</h2>
+   <div class="row"><div><label for="buscar">Buscar docente o área</label><input id="buscar" placeholder="Ej.: Matemáticas o Ríos"></div>
+    <button class="b ghost" id="fMarcar">Marcar todos los de la lista</button>
+    <button class="b ghost" id="fQuitar">Quitar todos los marcados</button>
+    <div><label for="fMotivo">Motivo para todos los marcados</label><select id="fMotivo"></select></div>
+    <button class="b ghost" id="fAplicar">Aplicar motivo</button></div>
+   <div class="lista" id="lista"></div>
+   <div class="chips" id="chips"></div>
+   <div class="row"><div style="flex:1;min-width:240px"><label for="nota">Nota para el aviso (sale en el mensaje)</label><input id="nota" style="width:100%" placeholder="Ej.: Hoy hay simulacro a las 9:00"></div></div>
+  </div>
+
+  <h2>Resumen del día <small id="resumen"></small></h2>
+  <div class="kpis" id="kpis"></div>
+
+  <div class="noimp" id="boxNov">
+   <h2>Novedades: quién cubre y si aceptó</h2>
+   <p><button class="b ghost" id="aceptarTodas">Marcar todas como aceptadas</button> <button class="b ghost" id="limpiarAcept">Quitar todas las marcas</button></p>
+   <div id="novedades"></div>
+  </div>
+
+  <h2>Horario de hoy</h2>
+  <div class="row noimp"><div><label for="grado">Ver grado</label><select id="grado"></select></div></div>
+  <div class="leg noimp" id="leyenda"></div>
+  <div class="scroll"><table id="grid"></table></div>
+  <div class="row noimp" style="margin-top:12px">
+   <button class="b lime" id="guardar">Guardar el día en el registro</button>
+   <button class="b ghost" id="imprimir">Imprimir horario del día</button>
+   <small id="okmsg"></small>
+  </div>
+ </div>
+
+ <!-- VISTA GENERAL -->
+ <div id="v-gen" style="display:none">
+  <div class="row noimp">
+   <div><label for="gtipo">Ver por</label><select id="gtipo"><option value="grupo">Grupo</option><option value="docente">Docente</option></select></div>
+   <div><label for="gitem">Escoger</label><select id="gitem"></select></div>
+   <button class="b ghost" id="imprimirG">Imprimir horario general</button>
+  </div>
+  <h2 id="gtitulo"></h2>
+  <div class="scroll"><table id="gtabla"></table></div>
+  <p><small>Horario de toda la semana, con la jornada normal. No muestra ausencias ni reemplazos.</small></p>
+ </div>
+</section>
+
+<section class="tab" id="t-gru">
+ <p><small>1) Diga cuántos grupos hay en cada grado (de 6.° a 11.°; primaria se maneja distinto). 2) Si faltan docentes en alguna hora, puede hacer que un grupo <b>entre más tarde</b> o <b>salga más temprano</b>. Esas horas quedan sin clase para ese grupo.</small></p>
+ <div id="gDiag"></div>
+ <div class="row">
+  <button class="b lime" id="sugerir">Sugerir ajuste automático</button>
+  <button class="b ghost" id="quitarAj">Quitar todos los ajustes</button>
+ </div>
+ <h2>Grupos por grado</h2>
+ <div class="scroll" style="max-height:none"><table id="gGrados"></table></div>
+ <h2>Entrada y salida de cada grupo</h2>
+ <div id="gTools"></div>
+ <div class="scroll"><table id="gGrupos"></table></div>
+</section>
+
+<section class="tab" id="t-nom">
+ <p><small>Escriba aquí los <b>nombres reales</b> de los docentes y su área. Sirve en el celular: abra esta página en el teléfono, llene la lista y toque «Copiar lista»; luego péguela en el computador (por WhatsApp, por ejemplo) en el cuadro «Pegar una lista». También puede llenar la plantilla de Excel (pestaña «Docentes y preferencias»). Los nombres se guardan solo en este equipo.</small></p>
+ <div id="nomEstado" style="margin-bottom:8px"></div>
+ <div id="nomLista"></div>
+ <h2>Agregar un docente</h2>
+ <div class="row"><div style="flex:1;min-width:200px"><label for="nomNuevo">Nombre completo</label><input id="nomNuevo" style="width:100%" placeholder="Ej.: Ana María Pérez"></div>
+  <div><label for="nomArea">Área o materia</label><select id="nomArea"></select></div>
+  <button class="b lime" id="nomAdd">Agregar</button></div>
+ <h2>Pegar una lista</h2>
+ <p><small>Un docente por línea: <b>Nombre; Área</b> (el área es opcional). Ejemplo: Ana María Pérez; Matemáticas</small></p>
+ <textarea id="nomPegar" rows="6" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:8px;font-size:.95rem" placeholder="Ana María Pérez; Matemáticas&#10;Carlos Gómez; Ed. Física"></textarea>
+ <div class="row" style="margin-top:8px"><button class="b lime" id="nomReemp">Reemplazar la lista con esto</button><button class="b ghost" id="nomAgr">Agregar al final</button></div>
+ <h2>Llevar la lista a otro equipo</h2>
+ <div class="row"><button class="b ghost" id="nomCopiar">Copiar lista</button><button class="b ghost" id="nomCsv">Descargar como CSV</button><button class="b ghost" id="nomEjemplo">Volver a los docentes de ejemplo</button></div>
+ <small id="nomMsg"></small>
+</section>
+
+<section class="tab" id="t-ayu"></section>
+
+<section class="tab" id="t-are">
+ <p><small>Para cada área o materia escoja <b>cómo van sus clases</b> (sencillas o en bloque de 2 horas seguidas) y <b>en qué parte de la jornada</b> prefiere que queden. Son preferencias: el horario las cumple hasta donde alcancen los docentes. El porcentaje muestra cuánto se cumplió.</small></p>
+ <div id="areTools"></div>
+ <div class="scroll" style="max-height:none"><table id="areas"></table></div>
+</section>
+
+<section class="tab" id="t-mem">
+ <p><small>Guarde hasta <b>5 horarios con nombre</b> (por ejemplo «Jornada de la mañana», «Con bloques de Ed. Física»). Se guarda la configuración: docentes del ejemplo, clases, jornada, descansos, grupos, preferencias de docentes y de áreas. No se guardan ausencias, registro ni celulares.</small></p>
+ <div id="memCards"></div>
+</section>
+
+<section class="tab" id="t-doc">
+ <p><small>En la versión real se cargan desde el Excel del colegio. <b>Entra desde / Sale hasta</b>: el horario se arma sin poner al docente en clases fuera de esa franja (por ejemplo, quien prefiere entrar a la 2.ª hora o salir después de la 5.ª). «Puede cubrir» solo se usa si están activados los reemplazos.</small></p>
+ <div class="noimp" style="border:2px dashed var(--ink);border-radius:12px;padding:12px;margin-bottom:14px">
+  <b>Cargar desde Excel</b>
+  <p style="margin:6px 0"><small>1) Descargue la plantilla y llénela en Excel. 2) Escoja aquí el archivo lleno. 3) Revise la vista previa y toque «Cargar en la app». También acepta un archivo .csv solo con los docentes.</small></p>
+  <div class="row" style="margin:0">
+   <a class="b ghost" href="Plantilla-Horario-al-Dia.xlsx" download style="text-decoration:none;display:inline-block">Descargar la plantilla de Excel</a>
+   <div><label for="xlsxFile">Archivo lleno (.xlsx o .csv)</label><input type="file" id="xlsxFile" accept=".xlsx,.csv"></div>
+  </div>
+  <div id="impVista" style="margin-top:10px"></div>
+ </div>
+ <div id="docTools"></div>
+ <div class="scroll"><table id="docs"></table></div>
+</section>
+
+<section class="tab" id="t-msj">
+ <p><small>Los botones abren WhatsApp con el mensaje listo. Si el docente no tiene celular anotado, WhatsApp pide escoger el contacto.</small></p>
+ <h2>Mensaje para el grupo de docentes</h2>
+ <div class="msg" id="msgGrupo"></div>
+ <button class="b wa" id="waGrupo">Enviar al grupo por WhatsApp</button>
+ <button class="b ghost" id="copiar">Copiar mensaje</button>
+ <h2>Mensajes personales <small id="nPers"></small></h2>
+ <p><button class="b ghost" id="copiarTodos">Copiar todos los mensajes personales</button></p>
+ <div id="personales"></div>
+</section>
+
+<section class="tab" id="t-inf">
+ <h2>Informe del mes <small id="mesTxt"></small></h2>
+ <div class="kpis" id="kpisMes"></div>
+ <div class="scroll"><table id="informe"></table></div>
+ <h2>Días guardados</h2>
+ <div class="scroll" style="max-height:200px"><table id="dias"></table></div>
+ <p><button class="b lime" id="csv">Descargar informe para Excel (CSV)</button>
+ <button class="b ghost" id="borrarReg">Borrar registro de ejemplo</button></p>
+</section>
+
+</main>
+
+<script>
+const NOM=['Marta','Hernán','Luz Dary','Jorge','Sandra','Camilo','Paola','Ramiro','Diana','Andrés','Claudia','Fabio','Gloria','Iván','Johana','Leonardo','Mónica','Néstor','Olga','Pablo','Rosa','Sergio','Tatiana','Uriel','Viviana'];
+const APE=['Ríos','Cano','Vélez','Pineda','Osorio','Ortiz','Mejía','Toro','Giraldo','Arango','Restrepo','Zuluaga','Londoño','Salazar','Duque','Builes','Montoya','Henao','Cardona','Alzate','Marín','Ospina','Quintero','Hoyos','Bedoya'];
+const AREAS_BASE=['Matemáticas','Lenguaje','Ciencias Naturales','Ciencias Sociales','Inglés','Ed. Física','Artística','Ética','Tecnología','Religión'];
+const AREAS=[...AREAS_BASE];           // base + las que escriba el usuario
+let AREAS_ACT=[...AREAS_BASE];         // solo las que tienen docentes
+const DIAS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const DSEM=['Lunes','Martes','Miércoles','Jueves','Viernes'];
+const MOTIVOS=['Incapacidad','Permiso','Calamidad','Citación Secretaría','Comisión','Otro'];
+const MINS=[30,35,40,45,50,55,60,65,70,75,80,85,90,100,110,120];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const KEY='horarioAlDiaProto3';
+let S={colegio:'Institución Educativa de Ejemplo',N:50,NP:6,reemp:false,vista:'dia',gtipo:'grupo',gitem:0,fecha:'',plantilla:'normal',jor:{ini:'06:30',fin:'12:00',min:0,desc:30},otro:{ini:'06:30',fin:'12:00',desc:30,extra:0},faltas:{},nota:'',tel:{},pref:{},docs:null,gpg:null,gwin:{},areaPref:{},mem:[null,null,null,null,null],memActiva:-1,noCubre:{},rechazos:{},acepta:{},reg:[],grado:'todos'};
+try{const g=JSON.parse(localStorage.getItem(KEY)||'null');if(g)S=Object.assign(S,g)}catch(e){}
+function guardarLocal(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+
+let DOCS=[],GRUPOS=[],GR=[];
+const GRADOS=[6,7,8,9,10,11];
+function construir(){
+ if(Array.isArray(S.docs)&&S.docs.length){
+  DOCS=S.docs.map(d=>({n:String(d.n||'').trim()||'Docente',a:String(d.a||'').trim()||'General'}));S.N=DOCS.length;
+ }else{
+  S.docs=null;const N=Number(S.N)||50;
+  DOCS=[];for(let i=0;i<N;i++)DOCS.push({n:NOM[i%25]+' '+APE[(i*7+Math.floor(i/25)*11+3)%25],a:AREAS_BASE[i%AREAS_BASE.length]});
+ }
+ AREAS.length=0;AREAS_BASE.forEach(a=>AREAS.push(a));DOCS.forEach(d=>{if(!AREAS.includes(d.a))AREAS.push(d.a)});
+ AREAS_ACT=AREAS.filter(a=>DOCS.some(d=>d.a===a));
+ const N=DOCS.length;
+ if(!S.gpg){const G=Math.max(4,Math.floor(N*0.6));const pg=Math.ceil(G/6);S.gpg={};GRADOS.forEach(g=>S.gpg[g]=pg)}
+ GRUPOS=[];GR=[];
+ GRADOS.forEach(g=>{for(let n=1;n<=Number(S.gpg[g]||0);n++){GRUPOS.push(g+'-'+n);GR.push(g)}});
+}
+function gIni(g){const w=S.gwin[GRUPOS[g]]||{};return Math.min(NPd(),Math.max(1,Number(w.ini)||1))}
+function gFin(g){const w=S.gwin[GRUPOS[g]]||{};const f=Number(w.fin)||NPd();return Math.max(gIni(g),Math.min(NPd(),f))}
+function activo(g,p){return p+1>=gIni(g)&&p+1<=gFin(g)}
+const NPd=()=>Number(S.NP);
+const descTras=()=>Math.ceil(NPd()/2);
+function pIni(i){const p=S.pref[i]||{};return Math.min(NPd(),Math.max(1,Number(p.ini)||1))}
+function pFin(i){const p=S.pref[i]||{};const f=Number(p.fin)||NPd();return Math.max(pIni(i),Math.min(NPd(),f))}
+function dentro(i,p){return p+1>=pIni(i)&&p+1<=pFin(i)}
+
+// ---- Generador del horario semanal (respeta preferencias de entrada y salida)
+let SCH=null,SCHKEY='',VIOL=0,SINDOC=0;
+function esquema(){
+ const key=JSON.stringify([S.N,S.NP,S.pref,S.gpg,S.gwin,S.areaPref,S.jor.descs||S.jor.desc,DOCS.map(d=>d.a).join('|')]);if(key===SCHKEY)return;
+ const N=DOCS.length,G=GRUPOS.length,P=NPd();const semana=new Array(N).fill(0);let viol=0,sindoc=0;
+ const bk=periodos(plantilla('normal')).bk;
+ let activas=0;for(let g=0;g<G;g++)activas+=gFin(g)-gIni(g)+1;
+ const capDia=Math.min(P,Math.ceil(Math.max(1,activas)/N*1.3));const sch=[];
+ const posScore=(a,p)=>{
+  const pos=(S.areaPref[a]||{}).pos;if(P<2)return 5;
+  if(pos==='inicio')return Math.round(10*p/(P-1));
+  if(pos==='final')return Math.round(10*(P-1-p)/(P-1));
+  if(pos==='mitad')return Math.round(10*Math.abs(p-(P-1)/2)/((P-1)/2));
+  return 5;
+ };
+ for(let d=0;d<5;d++){
+  const dia=[],diaC=new Array(N).fill(0),areaG=GRUPOS.map(()=>({}));
+  const res=Array.from({length:P+1},()=>({})); // reservas de bloques: res[p][g]=docente
+  for(let p=0;p<P;p++){
+   const fila=new Array(G).fill(-1),usado=new Set();
+   Object.keys(res[p]).forEach(g=>{fila[g]=res[p][g];usado.add(res[p][g])});
+   for(let k=0;k<G;k++){
+    const g=(k+d*3+p*5)%G;let mejor=-1,conPar=false;
+    if(fila[g]>=0||!activo(g,p))continue;
+    const puedePar=i=>p+1<P&&!bk[p+1]&&activo(g,p+1)&&dentro(i,p+1)&&res[p+1][g]===undefined&&!Object.values(res[p+1]).includes(i);
+    // nivel 0: todo estricto · 1: sin tope diario · 2: sin bloque · 3: sin franja del docente
+    for(let nivel=0;nivel<4&&mejor<0;nivel++){
+     let mk=null;
+     for(let i=0;i<N;i++){
+      if(usado.has(i))continue;
+      if(nivel<3&&!dentro(i,p))continue;
+      if(nivel===0&&diaC[i]>=capDia-((S.areaPref[DOCS[i].a]||{}).blq?1:0))continue;
+      const blq=!!(S.areaPref[DOCS[i].a]||{}).blq;
+      if(nivel<2&&blq&&!puedePar(i))continue;
+      const key=[areaG[g][DOCS[i].a]||0,posScore(DOCS[i].a,p),diaC[i],semana[i],(i*7+d*13+p*5+g*3)%N];
+      let menor=!mk;
+      if(mk){for(let z=0;z<5;z++){if(key[z]!==mk[z]){menor=key[z]<mk[z];break}}}
+      if(menor){mk=key;mejor=i;conPar=nivel<2&&blq}
+     }
+    }
+    if(mejor<0){fila[g]=-2;sindoc++;continue}
+    fila[g]=mejor;usado.add(mejor);diaC[mejor]++;semana[mejor]++;
+    areaG[g][DOCS[mejor].a]=(areaG[g][DOCS[mejor].a]||0)+1;
+    if(!dentro(mejor,p))viol++;
+    if(conPar){res[p+1][g]=mejor;diaC[mejor]++;semana[mejor]++;areaG[g][DOCS[mejor].a]++}
+   }
+   dia.push(fila);
+  }
+  sch.push(dia);
+ }
+ SCH=sch;SCHKEY=key;VIOL=viol;SINDOC=sindoc;
+}
+// cumplimiento de las preferencias por área (porcentaje de clases)
+function metricasAreas(){
+ esquema();const P=NPd(),G=GRUPOS.length,out={};
+ AREAS_ACT.forEach(a=>out[a]={tot:0,bloque:0,pos:0});
+ for(let d=0;d<5;d++)for(let g=0;g<G;g++){
+  for(let p=0;p<P;p++){
+   const t=SCH[d][p][g];if(t<0)continue;const a=DOCS[t].a,m=out[a];m.tot++;
+   const ant=p>0?SCH[d][p-1][g]:-1,sig=p+1<P?SCH[d][p+1][g]:-1;
+   if((ant>=0&&DOCS[ant].a===a)||(sig>=0&&DOCS[sig].a===a))m.bloque++;
+   const pos=(S.areaPref[a]||{}).pos,tercio=Math.max(1,Math.ceil(P/3));
+   if(pos==='inicio'&&p<tercio)m.pos++;
+   else if(pos==='final'&&p>=P-tercio)m.pos++;
+   else if(pos==='mitad'&&p>=tercio&&p<P-tercio)m.pos++;
+  }
+ }
+ return out;
+}
+// docentes que faltan por hora (según grupos activos y franja de cada docente)
+function diagnostico(){
+ const P=NPd(),out=[];
+ for(let p=0;p<P;p++){
+  let need=0,avail=0;
+  for(let g=0;g<GRUPOS.length;g++)if(activo(g,p))need++;
+  for(let i=0;i<DOCS.length;i++)if(dentro(i,p))avail++;
+  out.push({p,need,avail,falta:Math.max(0,need-avail)});
+ }
+ return out;
+}
+function sugerirAjuste(){
+ const P=NPd();let cambios=0;
+ for(let vuelta=0;vuelta<400;vuelta++){
+  const d=diagnostico().find(x=>x.falta>0);if(!d)break;
+  const temprano=d.p<P/2;
+  let cand=[];
+  for(let g=0;g<GRUPOS.length;g++){
+   if(!activo(g,d.p))continue;
+   if(temprano&&gIni(g)===d.p+1&&gFin(g)>gIni(g))cand.push(g);
+   if(!temprano&&gFin(g)===d.p+1&&gFin(g)>gIni(g))cand.push(g);
+  }
+  if(!cand.length)break;
+  // reparte entre grados: primero el último grupo de cada grado
+  const porGrado={};cand.forEach(g=>{(porGrado[GR[g]]=porGrado[GR[g]]||[]).push(g)});
+  const orden=[];let hay=true;
+  while(hay){hay=false;Object.keys(porGrado).sort((a,b)=>b-a).forEach(k=>{if(porGrado[k].length){orden.push(porGrado[k].pop());hay=true}})}
+  orden.slice(0,d.falta).forEach(g=>{
+   const w=S.gwin[GRUPOS[g]]=S.gwin[GRUPOS[g]]||{};
+   if(temprano)w.ini=gIni(g)+1;else w.fin=gFin(g)-1;cambios++;
+  });
+ }
+ return cambios;
+}
+function base(di,p,g){return SCH[di][p][g]}
+
+function hoyISO(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function toMin(h){const [a,b]=h.split(':').map(Number);return a*60+b}
+function toHora(m){return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')}
+function indiceDia(f){const w=new Date(f+'T12:00:00').getDay();return (w===0||w===6)?0:w-1}
+const HMIN=6*60,HMAX=18*60;
+function clampHora(v,porDefecto){if(!v)return porDefecto;const m=Math.min(HMAX,Math.max(HMIN,toMin(v)));return toHora(m)}
+// descansos: lista [{tras: después de qué clase, min}] (hasta 4)
+function descsBase(){
+ if(!Array.isArray(S.jor.descs))S.jor.descs=Number(S.jor.desc)>0?[{tras:Math.ceil(NPd()/2),min:Number(S.jor.desc)}]:[];
+ return S.jor.descs;
+}
+function bkMap(list){const m={};(list||[]).forEach(b=>{const t=Number(b.tras),mi=Number(b.min)||0;if(t>=1&&t<NPd()&&mi>0)m[t]=(m[t]||0)+mi});return m}
+function escalar(list,cap){
+ const tot=list.reduce((s,b)=>s+(Number(b.min)||0),0);
+ if(tot<=cap||tot===0)return list;
+ return list.map(b=>({tras:b.tras,min:Math.max(5,Math.round(Number(b.min)*cap/tot/5)*5)}));
+}
+function plantilla(k){
+ const j=S.jor,bl=descsBase(),fin=toMin(j.fin),ini=toMin(j.ini);
+ const rec=(m)=>toHora(Math.max(ini+60,m));
+ if(k==='normal')return {ini:j.ini,fin:j.fin,breaks:bl,extra:0,min:Number(j.min)||0};
+ if(k==='reunion')return {ini:j.ini,fin:rec(fin-60),breaks:escalar(bl,20),extra:0,min:0};
+ if(k==='izada')return {ini:j.ini,fin:j.fin,breaks:bl,extra:20,min:0};
+ if(k==='temprano')return {ini:j.ini,fin:rec(fin-90),breaks:escalar(bl,15),extra:0,min:0};
+ const od=Number(S.otro.desc)||0;
+ return {ini:S.otro.ini,fin:S.otro.fin,breaks:od>0?[{tras:Math.ceil(NPd()/2),min:od}]:[],extra:Number(S.otro.extra)||0,min:0};
+}
+// minutos por clase fijos (p.min>0) o automáticos (se reparten en la jornada)
+function periodos(pp){
+ const p=pp||plantilla(S.plantilla),NP=NPd(),out=[];
+ const extra=Number(p.extra)||0,bk=bkMap(p.breaks),desc=Object.values(bk).reduce((s,x)=>s+x,0);
+ let t=toMin(p.ini),dur,total=toMin(p.fin)-toMin(p.ini)-desc-extra;
+ if(p.min>0){
+  dur=p.min;
+  for(let i=0;i<NP;i++){const largo=dur+(i===0?extra:0);out.push({ini:t,fin:t+largo,n:i+1});t+=largo;if(bk[i+1])t+=bk[i+1]}
+ }else{
+  dur=Math.max(10,Math.floor(total/NP));
+  for(let i=0;i<NP;i++){
+   const largo=dur+(i===0?extra:0)+(i===NP-1?Math.max(0,total-dur*NP):0);
+   out.push({ini:t,fin:t+largo,n:i+1});t+=largo;if(bk[i+1])t+=bk[i+1];
+  }
+ }
+ const real=out[NP-1].fin;
+ return {per:out,dur,desc,bk,fija:p.min>0,real,diff:real-toMin(p.fin)}; // diff>0: se pasa de la salida; diff<0: sobra tiempo
+}
+function cargaMes(excluir){
+ const mes=S.fecha.slice(0,7),c={};
+ S.reg.forEach(r=>{if(r.fecha.slice(0,7)===mes&&r.fecha!==excluir)r.cubre.forEach(x=>c[x.por]=(c[x.por]||0)+1)});
+ return c;
+}
+function calcular(){
+ esquema();
+ const NP=NPd(),di=indiceDia(S.fecha),carga=cargaMes(S.fecha),hoy={},grid=[],lista=[];
+ for(let p=0;p<NP;p++){
+  const fila=[],ocupados=new Set(),cubriendo=new Set();
+  for(let g=0;g<GRUPOS.length;g++)if(base(di,p,g)>=0)ocupados.add(base(di,p,g));
+  for(let g=0;g<GRUPOS.length;g++){
+   const t=base(di,p,g);
+   if(t<0){fila.push({t,aus:false,sin:true});continue}
+   if(S.faltas[t]===undefined){fila.push({t,aus:false});continue}
+   const key=S.fecha+'|'+p+'|'+g;
+   if(!S.reemp){fila.push({t,aus:true,por:null,off:true});lista.push({p,g,t,por:null,key,ok:false,area:false,off:true});continue}
+   const rech=S.rechazos[key]||[];
+   const cand=DOCS.map((_,i)=>i).filter(i=>S.faltas[i]===undefined&&!S.noCubre[i]&&dentro(i,p)&&!ocupados.has(i)&&!cubriendo.has(i)&&!rech.includes(i));
+   cand.sort((a,b)=>{
+    const ma=DOCS[a].a===DOCS[t].a?0:1,mb=DOCS[b].a===DOCS[t].a?0:1;
+    return (ma-mb)||(((carga[a]||0)+(hoy[a]||0))-((carga[b]||0)+(hoy[b]||0)))||(a-b)});
+   let por=null;
+   if(cand.length){por=cand[0];cubriendo.add(por);hoy[por]=(hoy[por]||0)+1}
+   const c={t,aus:true,por,key,ok:S.acepta[key]===por&&por!==null,area:por!==null&&DOCS[por].a===DOCS[t].a};
+   fila.push(c);lista.push({p,g,t,por,key,ok:c.ok,area:c.area});
+  }
+  grid.push(fila);
+ }
+ return {grid,lista};
+}
+function fmtFecha(f){const d=new Date(f+'T12:00:00');return DIAS[d.getDay()]+' '+d.getDate()+'/'+(d.getMonth()+1)}
+
+function render(){
+ esquema();
+ const PD=periodos();const {per,dur,desc}=PD;const {grid,lista}=calcular();const NP=NPd();
+ [...$('tam').options].forEach(o=>{if(o.dataset.custom)o.remove()});
+ if(![...$('tam').options].some(o=>Number(o.value)===Number(S.N))){const o=document.createElement('option');o.value=S.N;o.textContent=S.N+' (mi lista)';o.dataset.custom='1';$('tam').appendChild(o)}
+ $('colegio').value=S.colegio;$('tam').value=S.N;$('np').value=S.NP;$('fecha').value=S.fecha;$('plantilla').value=S.plantilla;$('nota').value=S.nota;$('reemp').checked=!!S.reemp;
+ $('otro').style.display=S.plantilla==='otro'?'flex':'none';
+ $('ini').value=S.otro.ini;$('fin').value=S.otro.fin;$('desc').value=S.otro.desc;$('extra').value=S.otro.extra;
+ $('jIni').value=S.jor.ini;$('jFin').value=S.jor.fin;renderBreaks();
+ $('jMin').innerHTML='<option value="0">Automático (se reparte en la jornada)</option>'+MINS.map(m=>`<option value="${m}" ${Number(S.jor.min)===m?'selected':''}>${m} min</option>`).join('');
+ const pj=periodos(plantilla('normal')),dif=pj.diff;
+ $('jInfo').innerHTML=`<b>${NP} clases de ${pj.dur} min</b> · ingreso ${S.jor.ini} · ${Object.keys(pj.bk).length} descanso(s), ${pj.desc} min en total · las clases terminan a las <b>${toHora(pj.real)}</b>`
+  +(dif>0?`<div class="warn">⚠ No caben: terminan ${dif} min después de la hora de salida (${S.jor.fin}). Baje los minutos por clase, las clases por día o el descanso, o suba la hora de salida.</div>`
+   :(pj.fija&&dif<0?`<div class="warn" style="background:#fffbe6;border-color:var(--yel)">Sobran ${-dif} min antes de la hora de salida (${S.jor.fin}). Puede subir los minutos por clase o agregar una clase.</div>`:''));
+ const lab=(k,t)=>{const p=plantilla(k);return `${t} (${p.ini}–${p.fin})`};
+ [['normal','Normal'],['reunion','Reunión de docentes: salida 1 h antes'],['izada','Izada de bandera: primera hora +20 min'],['temprano','Salida temprana: 1,5 h antes']].forEach(([k,t])=>{const o=$('plantilla').querySelector(`option[value="${k}"]`);if(o)o.textContent=lab(k,t)});
+ $('plantilla').value=S.plantilla;
+ document.querySelectorAll('#vista button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.vista));
+ $('v-dia').style.display=S.vista==='dia'?'block':'none';$('v-gen').style.display=S.vista==='general'?'block':'none';
+ $('avisoPref').innerHTML=(PD.diff>0&&S.plantilla!=='normal'?`<div class="warn">⚠ Con la jornada «${$('plantilla').selectedOptions[0].textContent.split(' (')[0]}» las clases terminan ${PD.diff} min después de la salida. Reduzca las clases del día o cambie la jornada.</div>`:'')+(VIOL?`<div class="warn">⚠ ${VIOL} clase(s) quedaron fuera de la preferencia de algún docente porque no alcanzaban los docentes disponibles en esa hora. Revise «Docentes y preferencias» o ajuste la entrada y salida de grupos en «Grupos».</div>`:'')+(SINDOC?`<div class="warn">⚠ ${SINDOC} clase(s) de la semana quedaron «sin docente»: hay más grupos que docentes en esa hora. Use «Grupos» → «Sugerir ajuste automático».</div>`:'');
+ const grados=[...new Set(GR.map(String))];
+ $('grado').innerHTML='<option value="todos">Todos los grados</option>'+grados.map(g=>`<option value="${g}">${g}°</option>`).join('');
+ if(S.grado!=='todos'&&!grados.includes(S.grado))S.grado='todos';
+ $('grado').value=S.grado;
+ renderLista();
+ $('chips').innerHTML=Object.keys(S.faltas).map(i=>`<div class="chip"><b>${esc(DOCS[i].n)}</b><small>${DOCS[i].a}</small>
+  <select data-m="${i}">${MOTIVOS.map(m=>`<option ${S.faltas[i]===m?'selected':''}>${m}</option>`).join('')}</select>
+  <button class="s" data-q="${i}">Quitar</button></div>`).join('')||'<small>Nadie marcado todavía.</small>';
+ // tabla por día
+ const cols=GRUPOS.map((g,i)=>({g,i})).filter(x=>S.grado==='todos'||String(GR[x.i])===S.grado);
+ let h=`<tr><th>Hora</th>${cols.map(c=>`<th>${c.g}${gIni(c.i)>1||gFin(c.i)<NP?`<br><small>${gIni(c.i)}.ª–${gFin(c.i)}.ª</small>`:''}</th>`).join('')}</tr>`;
+ per.forEach((p,i)=>{
+  h+=`<tr><td class="hora">${p.n}.ª<br><small>${toHora(p.ini)}–${toHora(p.fin)}</small></td>`;
+  cols.forEach(({i:g})=>{
+   const c=grid[i][g];
+   if(c.t===-1){h+=`<td class="libre">${p.n<gIni(g)?'Aún no entra':'Ya salió'}</td>`;return}
+   if(c.t===-2){h+=`<td class="ning">Sin docente</td>`;return}
+   const a=DOCS[c.t].a;
+   if(!c.aus)h+=`<td>${a}<br><small>${esc(DOCS[c.t].n)}</small></td>`;
+   else if(c.off)h+=`<td class="aus">${a}<br><small>Ausente: ${esc(DOCS[c.t].n)}</small></td>`;
+   else if(c.por!==null)h+=`<td class="${c.ok?'ok':'rec'}">${a}<br><small><s>${esc(DOCS[c.t].n)}</s></small><br><b>Cubre: ${esc(DOCS[c.por].n)}</b></td>`;
+   else h+=`<td class="ning">${a}<br><small>Sin docente libre</small></td>`;
+  });
+  h+='</tr>';
+  if(PD.bk[p.n])h+=`<tr class="desc"><td colspan="${cols.length+1}">Descanso ${toHora(p.fin)}–${toHora(p.fin+PD.bk[p.n])} (${PD.bk[p.n]} min)</td></tr>`;
+ });
+ $('grid').innerHTML=h;
+ $('leyenda').innerHTML=S.reemp?'<span style="background:#fff1c9">Cubre otro (pendiente)</span><span style="background:#d9f3c4">Cubre (aceptó)</span><span style="background:#ffd9d3">Sin docente libre</span>':'<span style="background:#eee">Docente ausente (clase sin dictar)</span>';
+ // resumen
+ const nF=Object.keys(S.faltas).length,cub=lista.filter(x=>x.por!==null).length,ok=lista.filter(x=>x.ok).length,area=lista.filter(x=>x.area).length;
+ $('resumen').textContent=`· ${fmtFecha(S.fecha)} · ${NP} clases de ${dur} min · ${DOCS.length} docentes · ${GRUPOS.length} grupos`;
+ const k=S.reemp?[['Ausentes',nF],['Clases por cubrir',lista.length],['Con reemplazo',cub],['Aceptadas',ok],['Sin docente libre',lista.length-cub],['Mismo área',lista.length?Math.round(area*100/lista.length)+'%':'—']]:[['Ausentes',nF],['Clases sin dictar',lista.length],['Clases del día',grid.reduce((s,f)=>s+f.filter(c=>c.t>=0).length,0)]];
+ $('kpis').innerHTML=k.map(x=>`<div class="kpi"><small>${x[0]}</small><b>${x[1]}</b></div>`).join('');
+ $('boxNov').style.display=S.reemp?'block':'none';
+ $('novedades').innerHTML=lista.length?lista.map(x=>x.por===null
+   ?`<div class="nov ning"><span class="q"><b>${x.p+1}.ª hora (${toHora(per[x.p].ini)}) · ${GRUPOS[x.g]}</b> · ${DOCS[x.t].a} · falta ${esc(DOCS[x.t].n)}<br><b>Sin docente libre:</b> unir grupo, actividad guiada o coordinación cubre.</span></div>`
+   :`<div class="nov"><span class="q"><b>${x.p+1}.ª hora (${toHora(per[x.p].ini)}) · ${GRUPOS[x.g]}</b> · ${DOCS[x.t].a} · falta ${esc(DOCS[x.t].n)}<br>Cubre <b>${esc(DOCS[x.por].n)}</b> <small>(${DOCS[x.por].a}${x.area?' · mismo área ✔':''})</small></span>
+   <button class="s ${x.ok?'ok':''}" data-ok="${x.key}|${x.por}">${x.ok?'Aceptó ✔':'Marcar aceptó'}</button>
+   <button class="s no" data-no="${x.key}|${x.por}">No puede → siguiente</button></div>`).join('')
+  :'<small>Sin novedades. Marque ausentes arriba.</small>';
+ renderGeneral();renderMensajes(per,lista);renderInforme();renderDocs();renderGrupos();renderAreas();renderMem();renderNom();
+ if(!$('fMotivo').options.length)$('fMotivo').innerHTML=MOTIVOS.map(m=>`<option>${m}</option>`).join('');
+}
+function renderBreaks(){
+ const l=descsBase(),NP=NPd(),per=periodos(plantilla('normal')).per;
+ $('jNd').value=l.length;
+ const mins=[5,10,15,20,25,30,35,40,45,50,60,75,90];
+ const tr=l.map(b=>Number(b.tras));
+ const dup=tr.some((t,i)=>tr.indexOf(t)!==i);
+ $('jBreaks').innerHTML=l.map((b,k)=>`<div class="row" style="margin:6px 0"><b>Descanso ${k+1}:</b>
+  <select data-bt="${k}">${Array.from({length:NP-1},(_,x)=>`<option value="${x+1}" ${Number(b.tras)===x+1?'selected':''}>después de la clase ${x+1} (${toHora(per[x].fin)})</option>`).join('')}</select>
+  <select data-bm="${k}">${mins.map(m=>`<option value="${m}" ${Number(b.min)===m?'selected':''}>${m} min</option>`).join('')}</select></div>`).join('')
+  +(dup?'<small>Dos descansos están en el mismo lugar: se suman.</small>':'');
+}
+function renderGrupos(){
+ const NP=NPd(),{per}=periodos(plantilla('normal'));
+ const opc=(sel)=>Array.from({length:NP},(_,k)=>`<option value="${k+1}" ${sel===k+1?'selected':''}>${k+1}.ª (${toHora(per[k].ini)})</option>`).join('');
+ const dg=diagnostico(),faltan=dg.filter(x=>x.falta>0);
+ $('gDiag').innerHTML=faltan.length
+  ?`<div class="warn"><b>Faltan docentes en estas horas:</b><br>`+faltan.map(x=>`${x.p+1}.ª hora: hay ${x.need} grupos y solo ${x.avail} docentes disponibles (faltan ${x.falta}).`).join('<br>')+`</div>`
+  :`<div class="kpis"><div class="kpi"><small>Docentes vs. grupos</small><b>Alcanzan</b></div><div class="kpi"><small>Grupos</small><b>${GRUPOS.length}</b></div><div class="kpi"><small>Docentes</small><b>${DOCS.length}</b></div></div>`;
+ let h='<tr><th>Grado</th><th>Grupos</th><th>Todos entran desde</th><th>Todos salen hasta</th></tr>';
+ GRADOS.forEach(gr=>{
+  const idx=GR.map((x,i)=>x===gr?i:-1).filter(i=>i>=0);
+  const ini=idx.length?Math.max(...idx.map(gIni)):1,fin=idx.length?Math.min(...idx.map(gFin)):NP;
+  h+=`<tr><td><b>${gr}.°</b></td><td><select data-gn="${gr}">${[0,1,2,3,4,5,6,7,8].map(n=>`<option ${Number(S.gpg[gr]||0)===n?'selected':''}>${n}</option>`).join('')}</select></td>
+  <td><select data-gbi="${gr}" ${idx.length?'':'disabled'}>${opc(ini)}</select></td><td><select data-gbf="${gr}" ${idx.length?'':'disabled'}>${opc(fin)}</select></td></tr>`;
+ });
+ $('gGrados').innerHTML=h.replace('<th>Todos salen hasta</th></tr>','<th>Todos salen hasta</th><th>Copiar</th></tr>').replace(/<\/tr>(?=<tr>|$)/g,'</tr>');
+ // botón «copiar al resto de grados» por fila
+ $('gGrados').querySelectorAll('tr').forEach((tr,k)=>{if(k>0)tr.insertAdjacentHTML('beforeend',`<td><button class="s" data-gcp="${GRADOS[k-1]}">a los demás grados</button></td>`)});
+ h='<tr><th><input type="checkbox" data-sall="gru" title="Seleccionar todos"></th><th>Grupo</th><th>Entra desde</th><th>Sale hasta</th><th>Clases por día</th><th>Copiar a</th></tr>';
+ GRUPOS.forEach((l,g)=>{h+=`<tr><td><input type="checkbox" data-sg="${g}" ${SEL.gru[g]?'checked':''}></td><td><b>${l}</b></td><td><select data-gi="${g}">${opc(gIni(g))}</select></td><td><select data-gf="${g}">${opc(gFin(g))}</select></td><td>${gFin(g)-gIni(g)+1} de ${NP}</td><td style="white-space:nowrap"><button class="s" data-gca="${g}">todos</button> <button class="s" data-gcb="${g}">su grado</button></td></tr>`});
+ $('gGrupos').innerHTML=h;
+ $('gGrupos').querySelector('[data-sall="gru"]').checked=nSel(SEL.gru)===GRUPOS.length&&GRUPOS.length>0;
+ $('gTools').innerHTML=`<div class="row" style="align-items:center">
+  <button class="b ghost" data-tool="gru-all">Seleccionar todos</button>
+  <button class="b ghost" data-tool="gru-none">Ninguno</button>
+  <div><select id="gruGrado"><option value="">Seleccionar un grado…</option>${GRADOS.filter(x=>GR.includes(x)).map(x=>`<option value="${x}">${x}.°</option>`).join('')}</select></div>
+  <b>${nSel(SEL.gru)} seleccionados</b></div>
+  <div class="row" style="align-items:flex-end">Aplicar a los seleccionados:
+  <div><label>Entra desde</label><select id="gruBi"><option value="">— no cambiar —</option>${opc(0)}</select></div>
+  <div><label>Sale hasta</label><select id="gruBf"><option value="">— no cambiar —</option>${opc(0)}</select></div>
+  <button class="b lime" data-tool="gru-apply">Aplicar</button></div>`;
+}
+// ---- selección masiva y copiar al resto
+const SEL={doc:{},gru:{},are:{}};
+const nSel=o=>Object.keys(o).length;
+const POS={'':'Sin preferencia',inicio:'Al inicio de la jornada',mitad:'A mitad de la jornada',final:'Al final de la jornada'};
+function renderAreas(){
+ const mm=metricasAreas();
+ const cuenta={};DOCS.forEach(d=>cuenta[d.a]=(cuenta[d.a]||0)+1);
+ let h='<tr><th><input type="checkbox" data-sall="are" title="Seleccionar todas"></th><th>Área o materia</th><th>Docentes</th><th>Formato</th><th>Posición en la jornada</th><th>Cumplimiento</th><th>Copiar</th></tr>';
+ AREAS_ACT.forEach(a=>{
+  const ap=S.areaPref[a]||{},m=mm[a];
+  const bq=m.tot?Math.round(m.bloque*100/m.tot):0,ps=m.tot?Math.round(m.pos*100/m.tot):0;
+  const cum=m.tot?`${ap.blq?bq+' % en bloque':(100-bq)+' % sencillas'}${ap.pos?' · '+ps+' % en esa parte':''}`:'—';
+  h+=`<tr><td><input type="checkbox" data-sa="${a}" ${SEL.are[a]?'checked':''}></td><td style="text-align:left"><b>${a}</b></td><td>${cuenta[a]||0}</td>
+  <td><select data-af="${a}"><option value="sencilla" ${ap.blq?'':'selected'}>Sencillas (1 hora)</option><option value="bloque" ${ap.blq?'selected':''}>Bloques de 2 horas</option></select></td>
+  <td><select data-ap="${a}">${Object.keys(POS).map(k=>`<option value="${k}" ${(ap.pos||'')===k?'selected':''}>${POS[k]}</option>`).join('')}</select></td>
+  <td>${cum}</td><td><button class="s" data-cpr="${a}">a todas</button></td></tr>`;
+ });
+ $('areas').innerHTML=h;
+ $('areas').querySelector('[data-sall="are"]').checked=nSel(SEL.are)===AREAS_ACT.length;
+ $('areTools').innerHTML=`<div class="row" style="align-items:center">
+  <button class="b ghost" data-tool="are-all">Seleccionar todas</button>
+  <button class="b ghost" data-tool="are-none">Ninguna</button><b>${nSel(SEL.are)} seleccionadas</b></div>
+  <div class="row" style="align-items:flex-end">Aplicar a las seleccionadas:
+  <div><label>Formato</label><select id="areBf"><option value="">— no cambiar —</option><option value="sencilla">Sencillas</option><option value="bloque">Bloques de 2 horas</option></select></div>
+  <div><label>Posición</label><select id="areBp"><option value="-">— no cambiar —</option>${Object.keys(POS).map(k=>`<option value="${k}">${POS[k]}</option>`).join('')}</select></div>
+  <button class="b lime" data-tool="are-apply">Aplicar</button></div>`;
+}
+// ---- memorias de horarios (hasta 5)
+const MEM_KEYS=['colegio','docs','N','NP','jor','otro','gpg','gwin','pref','noCubre','areaPref','reemp','plantilla'];
+function snap(){const o={};MEM_KEYS.forEach(k=>o[k]=JSON.parse(JSON.stringify(S[k]===undefined?null:S[k])));return o}
+function guardarMem(k,nombre){S.mem[k]={name:(nombre||'').trim()||('Horario '+(k+1)),fecha:new Date().toLocaleString('es-CO'),data:snap()};S.memActiva=k;guardarLocal()}
+function cargarMem(k){
+ const m=S.mem[k];if(!m)return;
+ MEM_KEYS.forEach(x=>{S[x]=JSON.parse(JSON.stringify(m.data[x]))});
+ S.faltas={};S.rechazos={};S.acepta={};S.gitem=0;S.grado='todos';S.memActiva=k;SEL.doc={};SEL.gru={};SEL.are={};
+ construir();guardarLocal();
+}
+function memCambiada(k){return S.mem[k]&&JSON.stringify(snap())!==JSON.stringify(S.mem[k].data)}
+function renderMem(){
+ $('memRapida').innerHTML=`<b>Memorias de horarios:</b> `+S.mem.map((m,k)=>`<button class="b ${S.memActiva===k?'lime':'ghost'}" data-mload="${k}" ${m?'':'disabled'} title="${m?esc(m.fecha):'Vacía'}">${k+1}. ${m?esc(m.name):'vacía'}${S.memActiva===k&&memCambiada(k)?' *':''}</button>`).join(' ')
+  +`<div class="row" style="margin:8px 0 0"><div><label>Guardar el horario actual en la memoria</label><select id="mqSlot">${[0,1,2,3,4].map(k=>`<option value="${k}" ${k===(S.memActiva>=0?S.memActiva:S.mem.findIndex(x=>!x)>=0?S.mem.findIndex(x=>!x):0)?'selected':''}>${k+1}${S.mem[k]?' (reemplaza «'+esc(S.mem[k].name)+'»)':' (vacía)'}</option>`).join('')}</select></div>
+  <div><label>Nombre</label><input id="mqNombre" placeholder="Ej.: Jornada de la mañana"></div><button class="b lime" data-memq="save">Guardar</button>
+  <small>* = tiene cambios sin guardar</small></div>`;
+ $('memCards').innerHTML=S.mem.map((m,k)=>`<div style="border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px">
+  <b>Memoria ${k+1}</b>${S.memActiva===k?' <small>(activa'+(memCambiada(k)?', con cambios sin guardar':'')+')</small>':''}
+  <div class="row" style="margin:8px 0 0"><div><label>Nombre</label><input data-mname="${k}" value="${m?esc(m.name):''}" placeholder="Memoria ${k+1}"></div>
+  <button class="b lime" data-msave="${k}">Guardar el horario actual aquí</button>
+  <button class="b ghost" data-mload="${k}" ${m?'':'disabled'}>Cargar</button>
+  <button class="b ghost" data-mdel="${k}" ${m?'':'disabled'}>Borrar</button></div>
+  <small>${m?`Guardada el ${esc(m.fecha)} · ${m.data.N} docentes · ${Object.values(m.data.gpg||{}).reduce((s,x)=>s+Number(x),0)} grupos · ${m.data.NP} clases por día · jornada ${m.data.jor.ini}–${m.data.jor.fin}`:'Vacía'}</small></div>`).join('');
+}
+function renderLista(){
+ const q=$('buscar').value.trim().toLowerCase();
+ const items=DOCS.map((d,i)=>({d,i})).filter(x=>S.faltas[x.i]===undefined&&(!q||(x.d.n+' '+x.d.a).toLowerCase().includes(q))).slice(0,60);
+ $('lista').innerHTML=items.map(x=>`<label><input type="checkbox" data-f="${x.i}"> ${esc(x.d.n)} <small>${x.d.a}</small></label>`).join('')||'<small>Sin resultados.</small>';
+}
+// ---- Horario general (toda la semana)
+function renderGeneral(){
+ const tipo=S.gtipo,PG=periodos(plantilla('normal')),per=PG.per;const NP=NPd();
+ $('gtipo').value=tipo;
+ const opts=tipo==='grupo'?GRUPOS.map((g,i)=>`<option value="${i}">${g}</option>`):DOCS.map((d,i)=>`<option value="${i}">${esc(d.n)} (${d.a})</option>`);
+ $('gitem').innerHTML=opts.join('');
+ if(S.gitem>=opts.length)S.gitem=0;
+ $('gitem').value=S.gitem;const it=Number(S.gitem);
+ let h=`<tr><th>Hora</th>${DSEM.map(d=>`<th>${d}</th>`).join('')}</tr>`,n=0;
+ for(let p=0;p<NP;p++){
+  h+=`<tr><td class="hora">${p+1}.ª<br><small>${toHora(per[p].ini)}–${toHora(per[p].fin)}</small></td>`;
+  for(let d=0;d<5;d++){
+   if(tipo==='grupo'){const t=SCH[d][p][it];h+=t>=0?`<td>${DOCS[t].a}<br><small>${esc(DOCS[t].n)}</small></td>`:`<td class="${t===-2?'ning':'libre'}">${t===-2?'Sin docente':(p+1<gIni(it)?'Aún no entra':'Ya salió')}</td>`}
+   else{const g=SCH[d][p].indexOf(it);if(g>=0){n++;h+=`<td><b>${GRUPOS[g]}</b><br><small>${DOCS[it].a}</small></td>`}else h+='<td class="libre">libre</td>'}
+  }
+  h+='</tr>';
+  if(PG.bk[p+1])h+=`<tr class="desc"><td colspan="6">Descanso ${toHora(per[p].fin)}–${toHora(per[p].fin+PG.bk[p+1])} (${PG.bk[p+1]} min)</td></tr>`;
+ }
+ $('gtabla').innerHTML=h;
+ $('gtitulo').textContent=tipo==='grupo'?`Grupo ${GRUPOS[it]}: horario de la semana · entra desde la ${gIni(it)}.ª y sale hasta la ${gFin(it)}.ª`:`${DOCS[it].n}: horario de la semana · ${n} clases · entra desde la ${pIni(it)}.ª y sale hasta la ${pFin(it)}.ª`;
+}
+function renderMensajes(per,lista){
+ const pl=periodos();
+ const faltan=Object.keys(S.faltas).map(i=>`• ${DOCS[i].n} (${S.faltas[i]})`);
+ const cub=lista.filter(x=>x.por!==null),ning=lista.filter(x=>x.por===null);
+ let m=`📋 *${S.colegio}*\n*${fmtFecha(S.fecha)}*: horario del día\n${NPd()} clases · Entrada ${toHora(per[0].ini)} · Salida ${toHora(per[NPd()-1].fin)} · Clases de ${pl.dur} min`+(pl.desc?` · Descansos: ${Object.keys(pl.bk).sort((a,b)=>a-b).map(t=>`${toHora(per[t-1].fin)} (${pl.bk[t]} min)`).join(', ')}`:'')+'\n';
+ const aj=GRUPOS.map((l,g)=>({l,g})).filter(x=>gIni(x.g)>1||gFin(x.g)<NPd());
+ if(aj.length)m+=`\n*Grupos con entrada tarde o salida temprana:*\n`+aj.map(x=>`• ${x.l}: ${gIni(x.g)>1?`entra ${toHora(per[gIni(x.g)-1].ini)}`:''}${gIni(x.g)>1&&gFin(x.g)<NPd()?' · ':''}${gFin(x.g)<NPd()?`sale ${toHora(per[gFin(x.g)-1].fin)}`:''}`).join('\n')+'\n';
+ if(faltan.length)m+=`\n*No vienen (${faltan.length}):*\n${faltan.join('\n')}\n`;
+ if(S.reemp){
+  if(cub.length)m+=`\n*Reemplazos:*\n`+cub.map(x=>`• ${x.p+1}.ª (${toHora(per[x.p].ini)}) ${GRUPOS[x.g]}: ${DOCS[x.por].n}`).join('\n')+'\n';
+  if(ning.length)m+=`\n*Sin docente libre (coordinación define):*\n`+ning.map(x=>`• ${x.p+1}.ª hora ${GRUPOS[x.g]}`).join('\n')+'\n';
+ }else if(ning.length)m+=`\n*Clases sin dictar:*\n`+ning.map(x=>`• ${x.p+1}.ª (${toHora(per[x.p].ini)}) ${GRUPOS[x.g]}`).join('\n')+'\n';
+ if(S.nota)m+=`\n*Nota:* ${S.nota}\n`;
+ if(!faltan.length)m+='\nHoy no hay novedades. ✔';
+ $('msgGrupo').textContent=m;
+ window._pers={};let h='';
+ if(!S.reemp){$('nPers').textContent='';$('personales').innerHTML='<small>Los reemplazos están apagados. Actívelos en «Horario» si quiere mensajes personales para quien cubre.</small>';return}
+ const por={};cub.forEach(x=>{(por[x.por]=por[x.por]||[]).push(x)});
+ Object.keys(por).forEach(i=>{
+  const txt=`Profe ${DOCS[i].n.split(' ')[0]}, buenos días. Hoy ${fmtFecha(S.fecha)} le pedimos cubrir:\n`+por[i].map(x=>`• ${GRUPOS[x.g]} en la ${x.p+1}.ª hora (${toHora(per[x.p].ini)}–${toHora(per[x.p].fin)}), clase de ${DOCS[x.t].a}`).join('\n')+(S.nota?`\nNota: ${S.nota}`:'')+'\n¿Nos confirma? Gracias. — Coordinación';
+  window._pers[i]=txt;
+  h+=`<div class="msg"><b>${esc(DOCS[i].n)}</b>\n${esc(txt)}</div><button class="b wa" data-wa="${i}">Enviar a ${esc(DOCS[i].n)}</button><br><br>`;
+ });
+ $('nPers').textContent=`· ${Object.keys(por).length} docente(s)`;
+ $('personales').innerHTML=h||'<small>Nadie tiene que cubrir hoy.</small>';
+}
+function waUrl(t,tel){return 'https://wa.me/'+(tel?'57'+tel:'')+'?text='+encodeURIComponent(t)}
+function datosMes(){
+ const mes=S.fecha.slice(0,7),rs=S.reg.filter(r=>r.fecha.slice(0,7)===mes),cub={},aus={};let sin=0,tot=0;
+ rs.forEach(r=>{r.cubre.forEach(x=>cub[x.por]=(cub[x.por]||0)+1);r.ausentes.forEach(a=>aus[a.t]=(aus[a.t]||0)+1);sin+=r.ning.length;tot+=r.cubre.length+r.ning.length});
+ return {mes,rs,cub,aus,sin,tot};
+}
+function renderInforme(){
+ const {mes,rs,cub,aus,sin,tot}=datosMes();
+ $('mesTxt').textContent=`· ${mes} · ${rs.length} día(s) guardado(s)`;
+ $('kpisMes').innerHTML=[['Clases afectadas',tot],['Cubiertas',tot-sin],['Sin dictar',sin],['% cubierto',tot?Math.round((tot-sin)*100/tot)+'%':'—']].map(k=>`<div class="kpi"><small>${k[0]}</small><b>${k[1]}</b></div>`).join('');
+ let h='<tr><th>Docente</th><th>Área</th><th>Días ausente</th><th>Horas que cubrió</th></tr>';
+ DOCS.forEach((d,i)=>{if(aus[i]||cub[i])h+=`<tr><td style="text-align:left">${esc(d.n)}</td><td>${d.a}</td><td>${aus[i]||0}</td><td>${cub[i]||0}</td></tr>`});
+ if(!rs.length)h+='<tr><td colspan="4"><small>Guarde un día para ver el informe.</small></td></tr>';
+ h+=`<tr><th colspan="3" style="text-align:left">Horas sin dictar</th><th>${sin}</th></tr>`;
+ $('informe').innerHTML=h;
+ $('dias').innerHTML='<tr><th>Día</th><th>Ausentes</th><th>Cubiertas</th><th>Sin dictar</th><th>Guardado el</th></tr>'+rs.map(r=>`<tr><td>${fmtFecha(r.fecha)}</td><td>${r.ausentes.length}</td><td>${r.cubre.length}</td><td>${r.ning.length}</td><td>${esc(r.guardado||'')}</td></tr>`).join('');
+}
+function renderDocs(){
+ const {per}=periodos(plantilla('normal')),NP=NPd();
+ const opc=(sel)=>Array.from({length:NP},(_,k)=>`<option value="${k+1}" ${sel===k+1?'selected':''}>${k+1}.ª (${toHora(per[k].ini)})</option>`).join('');
+ let h='<tr><th><input type="checkbox" data-sall="doc" title="Seleccionar todos"></th><th>Docente</th><th>Área</th><th>Entra desde</th><th>Sale hasta</th><th>Puede cubrir</th><th>Copiar a</th><th>Celular (opcional)</th></tr>';
+ DOCS.forEach((d,i)=>{h+=`<tr><td><input type="checkbox" data-sd="${i}" ${SEL.doc[i]?'checked':''}></td><td style="text-align:left">${esc(d.n)}</td><td>${d.a}</td>
+  <td><select data-pi="${i}">${opc(pIni(i))}</select></td>
+  <td><select data-pf="${i}">${opc(pFin(i))}</select></td>
+  <td><input type="checkbox" data-pc="${i}" ${S.noCubre[i]?'':'checked'}></td>
+  <td style="white-space:nowrap"><button class="s" data-cpa="${i}">todos</button> <button class="s" data-cpb="${i}">su área</button></td>
+  <td><input data-tel="${i}" value="${esc(S.tel[i]||'')}" inputmode="numeric" maxlength="10" style="width:120px"></td></tr>`});
+ $('docs').innerHTML=h;
+ $('docs').querySelector('[data-sall="doc"]').checked=nSel(SEL.doc)===DOCS.length&&DOCS.length>0;
+ $('docTools').innerHTML=`<div class="row" style="align-items:center">
+  <button class="b ghost" data-tool="doc-all">Seleccionar todos</button>
+  <button class="b ghost" data-tool="doc-none">Ninguno</button>
+  <div><select id="docArea"><option value="">Seleccionar un área…</option>${AREAS_ACT.map(a=>`<option>${esc(a)}</option>`).join('')}</select></div>
+  <b>${nSel(SEL.doc)} seleccionados</b></div>
+  <div class="row" style="align-items:flex-end">Aplicar a los seleccionados:
+  <div><label>Entra desde</label><select id="docBi"><option value="">— no cambiar —</option>${opc(0)}</select></div>
+  <div><label>Sale hasta</label><select id="docBf"><option value="">— no cambiar —</option>${opc(0)}</select></div>
+  <div><label>Puede cubrir</label><select id="docBc"><option value="">— no cambiar —</option><option value="si">Sí</option><option value="no">No</option></select></div>
+  <button class="b lime" data-tool="doc-apply">Aplicar</button></div>`;
+}
+function refrescarMsj(){const {per}=periodos();renderMensajes(per,calcular().lista)}
+// eventos
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on','print'));
+ const t=$('t-'+b.dataset.t);t.classList.add('on');if(b.dataset.t==='hoy')t.classList.add('print');
+});
+$('vista').onclick=e=>{const v=e.target.dataset.v;if(v){S.vista=v;guardarLocal();render()}};
+$('reemp').onchange=e=>{S.reemp=e.target.checked;guardarLocal();render()};
+$('colegio').oninput=e=>{S.colegio=e.target.value;guardarLocal();refrescarMsj()};
+$('tam').onchange=e=>{
+ if(S.docs&&!confirm('Tiene una lista propia de docentes. Si cambia este tamaño, se usan docentes de ejemplo y se pierden los nombres escritos. ¿Continuar?')){e.target.value=S.N;return}
+ S.docs=null;S.N=Number(e.target.value);S.faltas={};S.noCubre={};S.tel={};S.pref={};S.rechazos={};S.acepta={};S.gitem=0;S.gpg=null;S.gwin={};SEL.doc={};SEL.gru={};construir();guardarLocal();render()};
+$('np').onchange=e=>{S.NP=Number(e.target.value);S.faltas={};S.rechazos={};S.acepta={};guardarLocal();render()};
+$('gGrados').onchange=e=>{
+ const d=e.target.dataset,v=Number(e.target.value);
+ if(d.gn!==undefined){S.gpg[d.gn]=v;SEL.gru={};S.gitem=0;S.faltas={};S.rechazos={};S.acepta={};S.grado='todos';construir()}
+ else if(d.gbi!==undefined){GRUPOS.forEach((l,g)=>{if(GR[g]===Number(d.gbi)){(S.gwin[l]=S.gwin[l]||{}).ini=v}})}
+ else if(d.gbf!==undefined){GRUPOS.forEach((l,g)=>{if(GR[g]===Number(d.gbf)){(S.gwin[l]=S.gwin[l]||{}).fin=v}})}
+ else return;
+ guardarLocal();render();
+};
+$('gGrupos').onchange=e=>{
+ const d=e.target.dataset,v=Number(e.target.value);
+ if(d.gi!==undefined)(S.gwin[GRUPOS[d.gi]]=S.gwin[GRUPOS[d.gi]]||{}).ini=v;
+ else if(d.gf!==undefined)(S.gwin[GRUPOS[d.gf]]=S.gwin[GRUPOS[d.gf]]||{}).fin=v;
+ else return;
+ guardarLocal();render();
+};
+$('sugerir').onclick=()=>{const n=sugerirAjuste();guardarLocal();render();alert(n?`Listo: se ajustó la entrada o la salida de ${n} grupo(s) para que alcancen los docentes.`:'No hizo falta ajustar nada (o no se pudo resolver con entrada tarde o salida temprana).')};
+$('quitarAj').onclick=()=>{S.gwin={};guardarLocal();render()};
+$('fecha').onchange=e=>{S.fecha=e.target.value||hoyISO();S.faltas={};guardarLocal();render()};
+$('plantilla').onchange=e=>{S.plantilla=e.target.value;guardarLocal();render()};
+['ini','fin'].forEach(k=>$(k).onchange=e=>{S.otro[k]=clampHora(e.target.value,S.otro[k]);if(toMin(S.otro.fin)-toMin(S.otro.ini)<60){if(k==='fin')S.otro.ini=toHora(Math.max(HMIN,toMin(S.otro.fin)-60));else S.otro.fin=toHora(Math.min(HMAX,toMin(S.otro.ini)+60))}guardarLocal();render()});
+['desc','extra'].forEach(k=>$(k).onchange=e=>{S.otro[k]=Math.max(0,Number(e.target.value)||0);guardarLocal();render()});
+// jornada del colegio
+$('jIni').onchange=e=>{S.jor.ini=clampHora(e.target.value,S.jor.ini);if(toMin(S.jor.fin)-toMin(S.jor.ini)<60)S.jor.fin=toHora(Math.min(HMAX,toMin(S.jor.ini)+60));if(toMin(S.jor.fin)-toMin(S.jor.ini)<60)S.jor.ini=toHora(toMin(S.jor.fin)-60);guardarLocal();render()};
+$('jFin').onchange=e=>{S.jor.fin=clampHora(e.target.value,S.jor.fin);if(toMin(S.jor.fin)-toMin(S.jor.ini)<60)S.jor.ini=toHora(Math.max(HMIN,toMin(S.jor.fin)-60));if(toMin(S.jor.fin)-toMin(S.jor.ini)<60)S.jor.fin=toHora(toMin(S.jor.ini)+60);guardarLocal();render()};
+$('jMin').onchange=e=>{S.jor.min=Number(e.target.value);guardarLocal();render()};
+$('jNd').onchange=e=>{
+ const n=Number(e.target.value),l=descsBase();
+ while(l.length>n)l.pop();
+ while(l.length<n){const usados=l.map(b=>Number(b.tras));let t=1;for(let k=1;k<NPd();k++){if(!usados.includes(k)){t=k;break}}l.push({tras:t,min:15})}
+ guardarLocal();render();
+};
+$('jBreaks').onchange=e=>{
+ const d=e.target.dataset,l=descsBase(),v=Number(e.target.value);
+ if(d.bt!==undefined)l[d.bt].tras=v;else if(d.bm!==undefined)l[d.bm].min=v;else return;
+ guardarLocal();render();
+};
+$('grado').onchange=e=>{S.grado=e.target.value;guardarLocal();render()};
+$('gtipo').onchange=e=>{S.gtipo=e.target.value;S.gitem=0;guardarLocal();render()};
+$('gitem').onchange=e=>{S.gitem=Number(e.target.value);guardarLocal();render()};
+$('buscar').oninput=renderLista;
+$('nota').oninput=e=>{S.nota=e.target.value;guardarLocal();refrescarMsj()};
+$('lista').onchange=e=>{const f=e.target.dataset.f;if(f===undefined)return;if(e.target.checked)S.faltas[f]='Incapacidad';guardarLocal();render()};
+$('chips').onchange=e=>{const m=e.target.dataset.m;if(m!==undefined){S.faltas[m]=e.target.value;guardarLocal();render()}};
+$('chips').onclick=e=>{const q=e.target.dataset.q;if(q!==undefined){delete S.faltas[q];guardarLocal();render()}};
+$('novedades').onclick=e=>{
+ const ok=e.target.dataset.ok,no=e.target.dataset.no;
+ if(ok){const parts=ok.split('|');const p=Number(parts.pop());const k=parts.join('|');S.acepta[k]=p;guardarLocal();render()}
+ if(no){const parts=no.split('|');const p=Number(parts.pop());const k=parts.join('|');(S.rechazos[k]=S.rechazos[k]||[]).push(p);delete S.acepta[k];guardarLocal();render()}
+};
+$('imprimir').onclick=()=>window.print();
+$('imprimirG').onclick=()=>window.print();
+$('guardar').onclick=()=>{
+ const l=calcular().lista;
+ S.reg=S.reg.filter(r=>r.fecha!==S.fecha);
+ S.reg.push({fecha:S.fecha,guardado:new Date().toLocaleString('es-CO'),ausentes:Object.keys(S.faltas).map(i=>({t:Number(i),motivo:S.faltas[i]})),cubre:l.filter(x=>x.por!==null).map(x=>({por:x.por,p:x.p,g:x.g})),ning:l.filter(x=>x.por===null).map(x=>({p:x.p,g:x.g}))});
+ guardarLocal();renderInforme();$('okmsg').textContent='Guardado en el registro de '+fmtFecha(S.fecha)+'.';
+};
+$('waGrupo').onclick=()=>window.open(waUrl($('msgGrupo').textContent,''),'_blank');
+$('copiar').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText($('msgGrupo').textContent)};
+$('personales').onclick=e=>{const i=e.target.dataset.wa;if(i!==undefined)window.open(waUrl(window._pers[i],S.tel[i]),'_blank')};
+$('docs').oninput=e=>{const i=e.target.dataset.tel;if(i===undefined)return;S.tel[i]=e.target.value.replace(/\D/g,'');guardarLocal()};
+$('docs').onchange=e=>{
+ const d=e.target.dataset;
+ if(d.sd!==undefined){if(e.target.checked)SEL.doc[d.sd]=true;else delete SEL.doc[d.sd];renderDocs();return}
+ if(d.sall==='doc'){SEL.doc={};if(e.target.checked)DOCS.forEach((_,i)=>SEL.doc[i]=true);renderDocs();return}
+ if(d.pc!==undefined){if(e.target.checked)delete S.noCubre[d.pc];else S.noCubre[d.pc]=true}
+ else if(d.pi!==undefined){(S.pref[d.pi]=S.pref[d.pi]||{}).ini=Number(e.target.value)}
+ else if(d.pf!==undefined){(S.pref[d.pf]=S.pref[d.pf]||{}).fin=Number(e.target.value)}
+ else return;
+ guardarLocal();render();
+};
+// copiar la fila de un docente al resto (o a los de su misma área)
+$('docs').onclick=e=>{
+ const d=e.target.dataset;if(d.cpa===undefined&&d.cpb===undefined)return;
+ const i=Number(d.cpa!==undefined?d.cpa:d.cpb),soloArea=d.cpb!==undefined;
+ const n=DOCS.filter((x,j)=>j!==i&&(!soloArea||x.a===DOCS[i].a)).length;
+ if(!n||!confirm(`¿Copiar la entrada, la salida y «puede cubrir» de ${DOCS[i].n} a ${n} docente(s)${soloArea?' de su área':''}?`))return;
+ const ini=pIni(i),fin=pFin(i),nc=!!S.noCubre[i];
+ DOCS.forEach((x,j)=>{if(j===i||(soloArea&&x.a!==DOCS[i].a))return;S.pref[j]={ini,fin};if(nc)S.noCubre[j]=true;else delete S.noCubre[j]});
+ guardarLocal();render();
+};
+$('docTools').onchange=e=>{
+ if(e.target.id==='docArea'&&e.target.value){SEL.doc={};DOCS.forEach((d,i)=>{if(d.a===e.target.value)SEL.doc[i]=true});renderDocs()}
+};
+$('docTools').onclick=e=>{
+ const t=e.target.dataset.tool;if(!t)return;
+ if(t==='doc-all'){DOCS.forEach((_,i)=>SEL.doc[i]=true);renderDocs()}
+ else if(t==='doc-none'){SEL.doc={};renderDocs()}
+ else if(t==='doc-apply'){
+  const bi=$('docBi').value,bf=$('docBf').value,bc=$('docBc').value,ids=Object.keys(SEL.doc);
+  if(!ids.length){alert('Primero seleccione docentes.');return}
+  if(!bi&&!bf&&!bc){alert('Escoja qué quiere cambiar.');return}
+  ids.forEach(i=>{const p=S.pref[i]=S.pref[i]||{};if(bi)p.ini=Number(bi);if(bf)p.fin=Number(bf);if(bc==='si')delete S.noCubre[i];if(bc==='no')S.noCubre[i]=true});
+  guardarLocal();render();
+ }
+};
+// grupos: selección y copiar
+$('gTools').onchange=e=>{
+ if(e.target.id==='gruGrado'&&e.target.value){SEL.gru={};GRUPOS.forEach((_,g)=>{if(GR[g]===Number(e.target.value))SEL.gru[g]=true});renderGrupos()}
+};
+$('gTools').onclick=e=>{
+ const t=e.target.dataset.tool;if(!t)return;
+ if(t==='gru-all'){GRUPOS.forEach((_,g)=>SEL.gru[g]=true);renderGrupos()}
+ else if(t==='gru-none'){SEL.gru={};renderGrupos()}
+ else if(t==='gru-apply'){
+  const bi=$('gruBi').value,bf=$('gruBf').value,ids=Object.keys(SEL.gru);
+  if(!ids.length){alert('Primero seleccione grupos.');return}
+  if(!bi&&!bf){alert('Escoja qué quiere cambiar.');return}
+  ids.forEach(g=>{const w=S.gwin[GRUPOS[g]]=S.gwin[GRUPOS[g]]||{};if(bi)w.ini=Number(bi);if(bf)w.fin=Number(bf)});
+  guardarLocal();render();
+ }
+};
+$('gGrupos').addEventListener('change',e=>{
+ const d=e.target.dataset;
+ if(d.sg!==undefined){if(e.target.checked)SEL.gru[d.sg]=true;else delete SEL.gru[d.sg];renderGrupos()}
+ else if(d.sall==='gru'){SEL.gru={};if(e.target.checked)GRUPOS.forEach((_,g)=>SEL.gru[g]=true);renderGrupos()}
+});
+$('gGrupos').onclick=e=>{
+ const d=e.target.dataset;if(d.gca===undefined&&d.gcb===undefined)return;
+ const g=Number(d.gca!==undefined?d.gca:d.gcb),soloGrado=d.gcb!==undefined;
+ const n=GRUPOS.filter((_,j)=>j!==g&&(!soloGrado||GR[j]===GR[g])).length;
+ if(!n||!confirm(`¿Copiar la entrada y la salida de ${GRUPOS[g]} a ${n} grupo(s)${soloGrado?' de su grado':''}?`))return;
+ const ini=gIni(g),fin=gFin(g);
+ GRUPOS.forEach((l,j)=>{if(j===g||(soloGrado&&GR[j]!==GR[g]))return;S.gwin[l]={ini,fin}});
+ guardarLocal();render();
+};
+$('gGrados').onclick=e=>{
+ const gr=e.target.dataset.gcp;if(gr===undefined)return;
+ const idx=GR.map((x,i)=>x===Number(gr)?i:-1).filter(i=>i>=0);
+ if(!confirm(`¿Copiar a todos los grados la cantidad de grupos y la entrada y salida de ${gr}.°?`))return;
+ const cant=Number(S.gpg[gr]||0),ini=idx.length?Math.max(...idx.map(gIni)):1,fin=idx.length?Math.min(...idx.map(gFin)):NPd();
+ GRADOS.forEach(x=>S.gpg[x]=cant);S.faltas={};S.rechazos={};S.acepta={};S.gitem=0;S.grado='todos';construir();
+ S.gwin={};GRUPOS.forEach(l=>{S.gwin[l]={ini,fin}});
+ guardarLocal();render();
+};
+// áreas y materias
+$('areas').onchange=e=>{
+ const d=e.target.dataset,v=e.target.value,ap=a=>(S.areaPref[a]=S.areaPref[a]||{});
+ if(d.sa!==undefined){if(e.target.checked)SEL.are[d.sa]=true;else delete SEL.are[d.sa];renderAreas();return}
+ if(d.sall==='are'){SEL.are={};if(e.target.checked)AREAS_ACT.forEach(a=>SEL.are[a]=true);renderAreas();return}
+ if(d.af!==undefined)ap(d.af).blq=v==='bloque';
+ else if(d.ap!==undefined)ap(d.ap).pos=v;
+ else return;
+ guardarLocal();render();
+};
+$('areas').onclick=e=>{
+ const a=e.target.dataset.cpr;if(a===undefined)return;
+ if(!confirm(`¿Copiar el formato y la posición de «${a}» a todas las áreas?`))return;
+ const src=Object.assign({},S.areaPref[a]||{});AREAS_ACT.forEach(x=>S.areaPref[x]=Object.assign({},src));
+ guardarLocal();render();
+};
+$('areTools').onclick=e=>{
+ const t=e.target.dataset.tool;if(!t)return;
+ if(t==='are-all'){AREAS_ACT.forEach(a=>SEL.are[a]=true);renderAreas()}
+ else if(t==='are-none'){SEL.are={};renderAreas()}
+ else if(t==='are-apply'){
+  const f=$('areBf').value,p=$('areBp').value,ids=Object.keys(SEL.are);
+  if(!ids.length){alert('Primero seleccione áreas.');return}
+  if(!f&&p==='-'){alert('Escoja qué quiere cambiar.');return}
+  ids.forEach(a=>{const o=S.areaPref[a]=S.areaPref[a]||{};if(f)o.blq=f==='bloque';if(p!=='-')o.pos=p});
+  guardarLocal();render();
+ }
+};
+// memorias
+function clicMem(e){
+ const d=e.target.dataset;
+ if(d.mload!==undefined){cargarMem(Number(d.mload));render()}
+ else if(d.msave!==undefined){const k=Number(d.msave),n=document.querySelector(`[data-mname="${k}"]`).value;if(S.mem[k]&&!confirm(`¿Reemplazar la memoria «${S.mem[k].name}»?`))return;guardarMem(k,n);renderMem()}
+ else if(d.mdel!==undefined){const k=Number(d.mdel);if(!confirm(`¿Borrar la memoria «${S.mem[k].name}»?`))return;S.mem[k]=null;if(S.memActiva===k)S.memActiva=-1;guardarLocal();renderMem()}
+ else if(d.memq==='save'){const k=Number($('mqSlot').value);if(S.mem[k]&&!confirm(`¿Reemplazar la memoria «${S.mem[k].name}»?`))return;guardarMem(k,$('mqNombre').value);renderMem()}
+}
+$('memRapida').onclick=clicMem;$('memCards').onclick=clicMem;
+// ausentes y novedades: acciones masivas
+$('fMarcar').onclick=()=>{
+ const q=$('buscar').value.trim().toLowerCase();
+ DOCS.forEach((d,i)=>{if(S.faltas[i]===undefined&&(!q||(d.n+' '+d.a).toLowerCase().includes(q)))S.faltas[i]=$('fMotivo').value||'Incapacidad'});
+ guardarLocal();render();
+};
+$('fQuitar').onclick=()=>{S.faltas={};guardarLocal();render()};
+$('fAplicar').onclick=()=>{Object.keys(S.faltas).forEach(i=>S.faltas[i]=$('fMotivo').value);guardarLocal();render()};
+$('aceptarTodas').onclick=()=>{calcular().lista.forEach(x=>{if(x.por!==null)S.acepta[x.key]=x.por});guardarLocal();render()};
+$('limpiarAcept').onclick=()=>{S.acepta={};guardarLocal();render()};
+$('copiarTodos').onclick=()=>{const t=Object.values(window._pers||{}).join('\n\n---\n\n');if(t&&navigator.clipboard)navigator.clipboard.writeText(t)};
+$('csv').onclick=()=>{
+ const {mes,cub,aus,sin}=datosMes();
+ let t='﻿Docente;Area;Dias ausente;Horas que cubrio\n';
+ DOCS.forEach((d,i)=>{if(aus[i]||cub[i])t+=`${d.n};${d.a};${aus[i]||0};${cub[i]||0}\n`});
+ t+=`Horas sin dictar;;;${sin}\n`;
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv;charset=utf-8'}));a.download='informe-'+mes+'.csv';a.click();
+};
+$('borrarReg').onclick=()=>{if(confirm('¿Borrar el registro guardado en este navegador?')){S.reg=[];guardarLocal();render()}};
+// ============ NOMBRES DE DOCENTES (editor, apto para celular) ============
+const MAX_DOC=80;
+function ensureDocs(){if(!S.docs)S.docs=DOCS.map(d=>({n:d.n,a:d.a}))}
+function opcionesArea(sel){
+ return AREAS.map(a=>`<option value="${esc(a)}" ${a===sel?'selected':''}>${esc(a)}</option>`).join('')+'<option value="__otra">➕ Otra área…</option>';
+}
+function renderNom(){
+ $('nomEstado').innerHTML=S.docs?`<div class="kpi" style="display:inline-block"><small>Lista propia</small><b>${DOCS.length} docentes</b></div>`
+  :`<div class="warn" style="background:#fffbe6;border-color:var(--yel)">Ahora ve <b>docentes de ejemplo</b> (inventados). Al cambiar un nombre o pegar una lista, pasan a ser su lista.</div>`;
+ $('nomLista').innerHTML=DOCS.map((d,i)=>`<div class="nom-row"><span class="n">${i+1}.</span><input data-nn="${i}" value="${esc(d.n)}" placeholder="Nombre completo"><select data-na="${i}">${opcionesArea(d.a)}</select><button class="s" data-nd="${i}" title="Quitar">✕</button></div>`).join('');
+ $('nomArea').innerHTML=opcionesArea('');
+}
+function remapDocs(idx){ // quitar el docente idx y correr los números
+ const f=o=>{const n={};Object.keys(o).forEach(k=>{k=Number(k);if(k===idx)return;n[k>idx?k-1:k]=o[k]});return n};
+ S.pref=f(S.pref);S.noCubre=f(S.noCubre);S.tel=f(S.tel);S.faltas=f(S.faltas);SEL.doc={};
+ S.reg.forEach(r=>{r.ausentes=r.ausentes.filter(a=>a.t!==idx).map(a=>({t:a.t>idx?a.t-1:a.t,motivo:a.motivo}));r.cubre=r.cubre.filter(x=>x.por!==idx).map(x=>({por:x.por>idx?x.por-1:x.por,p:x.p,g:x.g}))});
+ S.rechazos={};S.acepta={};
+}
+function reiniciarPorLista(){S.pref={};S.noCubre={};S.tel={};S.faltas={};S.rechazos={};S.acepta={};SEL.doc={};S.gitem=0}
+function parsearLista(txt){
+ const out=[];
+ txt.split(/\r?\n/).forEach(l=>{
+  l=l.trim();if(!l)return;
+  const p=l.split(/[;\t]|,(?=\s*\D)/).map(x=>x.trim());
+  const n=p[0].replace(/^\d+[.)\-]\s*/,'');if(!n)return;
+  out.push({n,a:p[1]||'General'});
+ });
+ return out;
+}
+function cambiosLista(){construir();guardarLocal();render()}
+$('nomLista').onchange=e=>{
+ const d=e.target.dataset;
+ if(d.nn!==undefined){ensureDocs();S.docs[d.nn].n=e.target.value.trim()||S.docs[d.nn].n;cambiosLista()}
+ else if(d.na!==undefined){
+  let v=e.target.value;
+  if(v==='__otra'){v=(prompt('Nombre del área o materia nueva:')||'').trim();if(!v){renderNom();return}}
+  ensureDocs();S.docs[d.na].a=v;cambiosLista();
+ }
+};
+$('nomLista').onclick=e=>{
+ const i=e.target.dataset.nd;if(i===undefined)return;
+ if(DOCS.length<=1){alert('Debe quedar al menos un docente.');return}
+ if(!confirm(`¿Quitar a ${DOCS[i].n} de la lista?`))return;
+ ensureDocs();remapDocs(Number(i));S.docs.splice(Number(i),1);cambiosLista();
+};
+$('nomAdd').onclick=()=>{
+ const n=$('nomNuevo').value.trim();if(!n){alert('Escriba el nombre del docente.');return}
+ if(DOCS.length>=MAX_DOC){alert('El máximo es '+MAX_DOC+' docentes.');return}
+ let a=$('nomArea').value;if(a==='__otra'){a=(prompt('Nombre del área o materia nueva:')||'').trim()}
+ ensureDocs();S.docs.push({n,a:a||'General'});$('nomNuevo').value='';cambiosLista();
+};
+$('nomReemp').onclick=()=>{
+ const l=parsearLista($('nomPegar').value);if(!l.length){alert('Pegue al menos un docente.');return}
+ if(l.length>MAX_DOC){alert('El máximo es '+MAX_DOC+' docentes; se usarán los primeros.');l.length=MAX_DOC}
+ if(!confirm(`¿Reemplazar la lista actual por ${l.length} docente(s)? Se reinician las preferencias por docente${S.reg.length?' y el registro guardado':''}.`))return;
+ S.docs=l;reiniciarPorLista();S.reg=[];$('nomPegar').value='';cambiosLista();
+};
+$('nomAgr').onclick=()=>{
+ const l=parsearLista($('nomPegar').value);if(!l.length){alert('Pegue al menos un docente.');return}
+ ensureDocs();l.forEach(x=>{if(S.docs.length<MAX_DOC)S.docs.push(x)});$('nomPegar').value='';cambiosLista();
+};
+$('nomCopiar').onclick=async()=>{
+ const t=DOCS.map(d=>`${d.n}; ${d.a}`).join('\n');
+ try{await navigator.clipboard.writeText(t);$('nomMsg').textContent='Lista copiada. Péguela en el otro equipo, en «Pegar una lista».'}
+ catch(e){$('nomPegar').value=t;$('nomMsg').textContent='No se pudo copiar solo: la lista quedó en el cuadro de abajo, selecciónela y cópiela.'}
+};
+$('nomCsv').onclick=()=>{
+ const t='﻿Nombre;Área;Celular\n'+DOCS.map((d,i)=>`${d.n};${d.a};${S.tel[i]||''}`).join('\n');
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv;charset=utf-8'}));a.download='docentes.csv';a.click();
+};
+$('nomEjemplo').onclick=()=>{
+ if(!S.docs){alert('Ya está usando los docentes de ejemplo.');return}
+ if(!confirm('¿Volver a los docentes de ejemplo? Se pierden los nombres escritos y las preferencias por docente.'))return;
+ S.docs=null;S.N=50;reiniciarPorLista();S.reg=[];cambiosLista();
+};
+
+// ============ CARGA DESDE EXCEL (.xlsx) o CSV ============
+async function inflar(u8){
+ const s=new Blob([u8]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+ return new Uint8Array(await new Response(s).arrayBuffer());
+}
+async function leerXlsx(buf){
+ const u8=new Uint8Array(buf),dv=new DataView(buf),td=new TextDecoder();
+ let e=u8.length-22;while(e>=0&&dv.getUint32(e,true)!==0x06054b50)e--;
+ if(e<0)throw new Error('El archivo no parece ser un Excel (.xlsx).');
+ const n=dv.getUint16(e+10,true);let p=dv.getUint32(e+16,true);const ent={};
+ for(let k=0;k<n;k++){
+  if(dv.getUint32(p,true)!==0x02014b50)break;
+  const met=dv.getUint16(p+10,true),cs=dv.getUint32(p+20,true),nl=dv.getUint16(p+28,true),el=dv.getUint16(p+30,true),cl=dv.getUint16(p+32,true),lo=dv.getUint32(p+42,true);
+  ent[td.decode(u8.subarray(p+46,p+46+nl))]={met,cs,lo};p+=46+nl+el+cl;
+ }
+ const leer=async nombre=>{
+  const z=ent[nombre];if(!z)return null;
+  const nl=dv.getUint16(z.lo+26,true),el=dv.getUint16(z.lo+28,true),ini=z.lo+30+nl+el,dat=u8.subarray(ini,ini+z.cs);
+  return td.decode(z.met===0?dat:await inflar(dat));
+ };
+ const xml=async nombre=>{const t=await leer(nombre);return t?new DOMParser().parseFromString(t,'application/xml'):null};
+ const ss=[];const sx=await xml('xl/sharedStrings.xml');
+ if(sx)[...sx.getElementsByTagName('si')].forEach(si=>ss.push([...si.getElementsByTagName('t')].map(t=>t.textContent).join('')));
+ const wb=await xml('xl/workbook.xml'),rel=await xml('xl/_rels/workbook.xml.rels');
+ if(!wb||!rel)throw new Error('No se pudo leer el libro de Excel.');
+ const dest={};[...rel.getElementsByTagName('Relationship')].forEach(r=>{let t=r.getAttribute('Target');dest[r.getAttribute('Id')]=t.startsWith('/')?t.slice(1):'xl/'+t});
+ const hojas={};
+ for(const sh of [...wb.getElementsByTagName('sheet')]){
+  const nombre=sh.getAttribute('name'),ruta=dest[sh.getAttribute('r:id')],doc=ruta&&await xml(ruta);if(!doc)continue;
+  const filas=[];
+  [...doc.getElementsByTagName('row')].forEach(row=>{
+   const ri=Number(row.getAttribute('r'))-1,fila=[];
+   [...row.getElementsByTagName('c')].forEach(c=>{
+    const ref=c.getAttribute('r')||'',col=ref.replace(/\d+/g,'').split('').reduce((s,ch)=>s*26+ch.charCodeAt(0)-64,0)-1,t=c.getAttribute('t'),v=c.getElementsByTagName('v')[0];
+    let val='';
+    if(t==='s'&&v)val=ss[Number(v.textContent)]||'';
+    else if(t==='inlineStr')val=[...c.getElementsByTagName('t')].map(x=>x.textContent).join('');
+    else if(v)val=v.textContent;
+    fila[col]=val;
+   });
+   filas[ri]=fila;
+  });
+  hojas[nombre]=Array.from(filas,f=>f||[]);
+ }
+ return hojas;
+}
+function leerCsv(txt){
+ txt=txt.replace(/^﻿/,'');const primera=txt.split(/\r?\n/)[0]||'';
+ const sep=[';','\t',','].reduce((m,s)=>primera.split(s).length>primera.split(m).length?s:m,';');
+ return txt.split(/\r?\n/).filter(l=>l.trim()).map(l=>{const o=[];let cur='',q=false;for(const ch of l){if(ch==='"')q=!q;else if(ch===sep&&!q){o.push(cur);cur=''}else cur+=ch}o.push(cur);return o.map(x=>x.trim())});
+}
+const norm=s=>String(s==null?'':s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
+function hojaPor(hojas,pref){const k=Object.keys(hojas).find(n=>norm(n).startsWith(pref));return k?hojas[k]:null}
+function entero(v){const n=Number(String(v).replace(',','.'));return Number.isFinite(n)&&String(v).trim()!==''?Math.round(n):null}
+function parseHoraX(v){
+ const s=String(v).trim();if(!s)return null;
+ if(/^\d{1,2}:\d{2}/.test(s)){const [a,b]=s.split(':');return Number(a)*60+Number(b.slice(0,2))}
+ const n=Number(s.replace(',','.'));if(Number.isFinite(n)&&n>0&&n<1)return Math.round(n*1440);
+ return null;
+}
+function interpretar(hojas){
+ const plan={},res=[],av=[];
+ // Docentes
+ const hd=hojaPor(hojas,'docentes');
+ if(hd){
+  let ini=hd.findIndex(f=>norm(f[0]).includes('nombre'));ini=ini<0?0:ini+1;
+  const docs=[],tel={},pref={},nc={};
+  for(let r=ini;r<hd.length;r++){
+   const f=hd[r]||[],nombre=String(f[0]||'').trim();if(!nombre)continue;
+   if(docs.length>=MAX_DOC){av.push(`Solo se tomaron los primeros ${MAX_DOC} docentes.`);break}
+   const i=docs.length;docs.push({n:nombre,a:String(f[1]||'').trim()||'General'});
+   let t=String(f[2]||'').replace(/\D/g,'');if(t.length===12&&t.startsWith('57'))t=t.slice(2);
+   if(t){if(t.length===10)tel[i]=t;else av.push(`Fila ${r+1}: el celular de ${nombre} no tiene 10 dígitos y se ignoró.`)}
+   const a=entero(f[3]),b=entero(f[4]);
+   if((a!==null&&(a<1||a>8))||(b!==null&&(b<1||b>8))){av.push(`Fila ${r+1}: «entra/sale» de ${nombre} debe ser de 1 a 8; se ignoró.`)}
+   else{if(a!==null||b!==null){pref[i]={};if(a!==null)pref[i].ini=a;if(b!==null)pref[i].fin=b;if(a!==null&&b!==null&&a>b)av.push(`Fila ${r+1}: ${nombre} entra después de lo que sale; se ajustará.`)}}
+   if(['no','n','false','0'].includes(norm(f[5])))nc[i]=true;
+  }
+  if(docs.length){
+   plan.docs=docs;plan.tel=tel;plan.pref=pref;plan.noCubre=nc;
+   const nombres=docs.map(d=>norm(d.n));if(new Set(nombres).size<nombres.length)av.push('Hay nombres repetidos en la lista de docentes.');
+   const ar=[...new Set(docs.map(d=>d.a))];
+   res.push(`<b>Docentes:</b> ${docs.length} · áreas: ${ar.map(esc).join(', ')}`);
+   const nuevas=ar.filter(a=>!AREAS_BASE.includes(a));if(nuevas.length)av.push('Áreas nuevas que se crearán: '+nuevas.join(', ')+'.');
+  }
+ }
+ // Grupos
+ const hg=hojaPor(hojas,'grupos');
+ if(hg){
+  const g={},w={};let algun=false;
+  hg.forEach(f=>{
+   const gr=entero(f[0]);if(gr===null||gr<6||gr>11)return;
+   const c=entero(f[1]);if(c===null)return;
+   if(c<0||c>8){av.push(`Grado ${gr}: la cantidad de grupos debe ser de 0 a 8; se ignoró.`);return}
+   algun=true;g[gr]=c;
+   const a=entero(f[2]),b=entero(f[3]);if(a!==null||b!==null)w[gr]={ini:a,fin:b};
+  });
+  if(algun){GRADOS.forEach(x=>{if(g[x]===undefined)g[x]=0});plan.gpg=g;plan.gwinGrado=w;res.push('<b>Grupos:</b> '+GRADOS.filter(x=>g[x]).map(x=>`${x}.°: ${g[x]}`).join(' · ')+(Object.keys(w).length?` · ${Object.keys(w).length} grado(s) con entrada tarde o salida temprana`:''))}
+ }
+ // Jornada
+ const hj=hojaPor(hojas,'jornada');
+ if(hj){
+  const j={},desc={};
+  hj.forEach(f=>{
+   const k=norm(f[0]),v=f[1];if(v===undefined||String(v).trim()==='')return;
+   let m;
+   if(k.includes('ingreso'))j.ini=parseHoraX(v);
+   else if(k.includes('salida'))j.fin=parseHoraX(v);
+   else if(k.includes('clases por dia'))j.np=entero(v);
+   else if(k.includes('minutos por clase'))j.min=entero(v);
+   else if((m=k.match(/descanso\s*(\d)/))){const n=Number(m[1]);(desc[n]=desc[n]||{});if(k.includes('despues'))desc[n].tras=entero(v);else if(k.includes('minutos'))desc[n].min=entero(v)}
+  });
+  const o={};
+  if(j.ini!=null){if(j.ini<HMIN||j.ini>HMAX)av.push('La hora de ingreso debe estar entre 06:00 y 18:00; se ajustó.');o.ini=toHora(Math.min(HMAX,Math.max(HMIN,j.ini)))}
+  if(j.fin!=null){if(j.fin<HMIN||j.fin>HMAX)av.push('La hora de salida debe estar entre 06:00 y 18:00; se ajustó.');o.fin=toHora(Math.min(HMAX,Math.max(HMIN,j.fin)))}
+  if(j.np!=null){if(j.np<4||j.np>8)av.push('Las clases por día deben ser de 4 a 8; se ajustó.');o.np=Math.min(8,Math.max(4,j.np))}
+  if(j.min!=null){if(j.min!==0&&(j.min<20||j.min>120))av.push('Los minutos por clase deben ser 0 (automático) o entre 20 y 120; se ignoró.');else o.min=j.min}
+  const ds=Object.keys(desc).sort().slice(0,4).map(k=>desc[k]).filter(d=>d.tras&&d.min);
+  if(Object.keys(desc).length){o.descs=ds.map(d=>({tras:d.tras,min:d.min}))}
+  if(Object.keys(o).length){
+   plan.jor=o;
+   res.push(`<b>Jornada:</b> ${o.ini||'—'} a ${o.fin||'—'}${o.np?` · ${o.np} clases por día`:''}${o.min!==undefined?` · ${o.min?o.min+' min por clase':'minutos automáticos'}`:''}${o.descs?` · ${o.descs.length} descanso(s)`:''}`);
+  }
+ }
+ // Áreas
+ const ha=hojaPor(hojas,'areas');
+ if(ha){
+  const ap={};
+  let ini=ha.findIndex(f=>norm(f[0]).includes('area'));ini=ini<0?0:ini+1;
+  for(let r=ini;r<ha.length;r++){
+   const f=ha[r]||[],a=String(f[0]||'').trim();if(!a)continue;
+   const fm=norm(f[1]),ps=norm(f[2]),o={};
+   if(fm.includes('bloque'))o.blq=true;else if(fm.includes('sencill'))o.blq=false;
+   if(ps.includes('inicio'))o.pos='inicio';else if(ps.includes('mitad'))o.pos='mitad';else if(ps.includes('final'))o.pos='final';else if(ps.includes('sin'))o.pos='';
+   if(Object.keys(o).length)ap[a]=o;
+  }
+  if(Object.keys(ap).length){plan.areaPref=ap;res.push(`<b>Áreas:</b> preferencias para ${Object.keys(ap).length} área(s)`)}
+ }
+ plan.res=res;plan.av=av;return plan;
+}
+function mostrarVista(plan,nombre){
+ window._imp=plan;
+ if(!plan.res.length){$('impVista').innerHTML=`<div class="warn">No encontré datos para cargar en «${esc(nombre)}». Revise que sea la plantilla y que tenga las hojas «Docentes», «Grupos», «Jornada» o «Áreas» con datos.</div>`;return}
+ $('impVista').innerHTML=`<div style="border:1px solid var(--line);border-radius:10px;padding:10px"><b>Vista previa de «${esc(nombre)}»</b>
+  <ul style="margin:6px 0 6px 18px">${plan.res.map(r=>`<li>${r}</li>`).join('')}</ul>
+  ${plan.av.length?`<div class="warn"><b>Avisos:</b><br>${plan.av.map(esc).join('<br>')}</div>`:''}
+  <small>Lo que ya tenía en la app para esas partes se reemplaza. Si quiere conservarlo, guárdelo antes en una memoria.</small>
+  <div class="row" style="margin:8px 0 0"><button class="b lime" id="impOk">Cargar en la app</button><button class="b ghost" id="impNo">Cancelar</button></div></div>`;
+}
+function aplicarImport(plan){
+ if(plan.docs){
+  if(S.reg.length&&!confirm('Cargar una lista nueva de docentes reinicia el registro guardado. ¿Continuar?'))return false;
+  S.docs=plan.docs;S.tel=plan.tel||{};S.pref=plan.pref||{};S.noCubre=plan.noCubre||{};S.reg=[];
+ }
+ if(plan.gpg){S.gpg=plan.gpg;S.gwin={}}
+ if(plan.jor){
+  const j=plan.jor;
+  if(j.ini)S.jor.ini=j.ini;if(j.fin)S.jor.fin=j.fin;
+  if(toMin(S.jor.fin)-toMin(S.jor.ini)<60)S.jor.fin=toHora(Math.min(HMAX,toMin(S.jor.ini)+60));
+  if(j.np)S.NP=j.np;if(j.min!==undefined)S.jor.min=j.min;
+  if(j.descs){S.jor.descs=j.descs;delete S.jor.desc}
+ }
+ if(plan.areaPref)Object.keys(plan.areaPref).forEach(a=>{S.areaPref[a]=Object.assign({},S.areaPref[a]||{},plan.areaPref[a])});
+ S.faltas={};S.rechazos={};S.acepta={};S.gitem=0;S.grado='todos';SEL.doc={};SEL.gru={};SEL.are={};S.memActiva=-1;
+ construir();
+ if(plan.gwinGrado)GRUPOS.forEach((l,g)=>{const w=plan.gwinGrado[GR[g]];if(w){S.gwin[l]={};if(w.ini!=null)S.gwin[l].ini=w.ini;if(w.fin!=null)S.gwin[l].fin=w.fin}});
+ guardarLocal();render();return true;
+}
+$('xlsxFile').onchange=async e=>{
+ const f=e.target.files[0];if(!f)return;
+ try{
+  let hojas;
+  if(/\.csv$/i.test(f.name))hojas={Docentes:leerCsv(await f.text())};
+  else hojas=await leerXlsx(await f.arrayBuffer());
+  mostrarVista(interpretar(hojas),f.name);
+ }catch(err){$('impVista').innerHTML=`<div class="warn">No se pudo leer el archivo: ${esc(err.message||err)}. Pruebe guardarlo de nuevo como .xlsx desde Excel.</div>`}
+ e.target.value='';
+};
+$('impVista').onclick=e=>{
+ if(e.target.id==='impNo'){$('impVista').innerHTML='';window._imp=null}
+ if(e.target.id==='impOk'&&window._imp){if(aplicarImport(window._imp)){$('impVista').innerHTML='<div class="kpi" style="display:inline-block"><small>Listo</small><b>Datos cargados ✔</b></div>';window._imp=null}}
+};
+if(!S.fecha)S.fecha=hoyISO();
+construir();render();
+</script>
+<script src="licencia-publica.js"></script>
+<script src="licencia.js"></script>
+</body>
+</html>
